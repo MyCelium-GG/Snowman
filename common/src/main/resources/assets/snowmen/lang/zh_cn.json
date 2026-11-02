@@ -1,0 +1,9 @@
+{
+  "item.snowmen.rolled_snowball": "滚好的雪球",
+  "item.snowmen.rolled_snowball.size": "大小 %s",
+  "item.snowmen.rolled_snowball.hint": "放在地上，或放到更大的雪球上",
+  "item.snowmen.top_hat": "高礼帽",
+  "item.snowmen.top_hat.hint": "戴上它的雪人永远不会融化",
+  "key.snowmen.rotate": "转动雪人",
+  "snowmen.hint.rotate": "按 %s 转动雪人"
+}

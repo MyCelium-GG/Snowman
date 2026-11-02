@@ -46,7 +46,7 @@ class StateTest {
         assertTrue(State.isStateTag("snowmen.b1=4"));
         assertTrue(State.isStateTag("snowmen.scarf=red"));
         assertFalse(State.isStateTag(State.ROOT));
-        assertFalse(State.isStateTag(State.CARRIED));
+        assertFalse(State.isStateTag("snowmen.of=0c1d2e3f-0000-0000-0000-000000000000"));
         assertFalse(State.isStateTag(State.PART + ".ball.0"));
         assertFalse(State.isStateTag("minecraft.anything"));
     }

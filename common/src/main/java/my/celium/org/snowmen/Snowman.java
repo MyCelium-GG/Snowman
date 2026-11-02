@@ -4,17 +4,24 @@ import com.mojang.math.Transformation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import my.celium.org.snowmen.mixin.BlockDisplayAccessor;
 import my.celium.org.snowmen.mixin.DisplayAccessor;
 import my.celium.org.snowmen.mixin.InteractionAccessor;
 import my.celium.org.snowmen.mixin.ItemDisplayAccessor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -29,6 +36,8 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -45,26 +54,32 @@ import org.joml.Vector3f;
  * Everything players do with snowballs and snowmen, on the server.
  *
  * <p>A snowball or snowman is one invisible {@link Interaction} entity (the "root", which
- * players click) with vanilla display entities riding it for the looks. What it is made of
- * is stored as tags on the root ({@link State}), so it needs no save data of its own.
+ * players click) plus vanilla display entities at the same spot for the looks. What it is
+ * made of is stored as tags on the root ({@link State}); each display is tagged with its
+ * root's UUID. Displays are not passengers, so they can glide smoothly when the root moves.
  */
 public final class Snowman {
-    /** Ticks a roll takes from one block to the next. */
-    private static final int ROLL_TICKS = 4;
+    /** Ticks a roll takes from one block to the next; clients glide the displays over this time. */
+    private static final int ROLL_TICKS = 5;
     /** Two hits on a snowman within this many ticks knock it over. */
     private static final int DOUBLE_HIT_TICKS = 12;
     /** How often melting is checked, in ticks. */
     private static final int MELT_TICKS = 300;
+    /** Item data key of a picked-up snowball. */
+    private static final String ITEM_SIZE = "snowmen_size";
+    private static final String OWNER = State.PREFIX + "of=";
+    /** How often the rotate hint is refreshed, and from how far away. */
+    private static final int HINT_TICKS = 20;
+    private static final double HINT_RANGE = 3.5;
+    /** How far away the rotate key reaches, and how far one press turns. */
+    private static final double ROTATE_RANGE = 5;
+    private static final float ROTATE_STEP = 45;
 
-    private record Motion(Vec3 from, Vec3 to, int[] step) {
-    }
-
-    private static final Map<Interaction, Motion> MOTION = new WeakHashMap<>();
+    private static final Map<Interaction, Long> BUSY = new WeakHashMap<>();
     private static final Map<Interaction, Quaternionf> SPIN = new WeakHashMap<>();
     private static final Map<Interaction, Long> LAST_HIT = new WeakHashMap<>();
     private static final Map<Interaction, int[]> WOBBLE = new WeakHashMap<>();
-    /** Who carries which snowball. Minecraft does not let entities ride players, so it follows instead. */
-    private static final Map<java.util.UUID, Interaction> CARRYING = new HashMap<>();
+    private static final Map<Interaction, List<Display>> PARTS = new WeakHashMap<>();
     /** A hat waiting for the next rebuild, because the display that holds it is created there. */
     private static final Map<Interaction, ItemStack> NEW_HAT = new WeakHashMap<>();
 
@@ -79,7 +94,59 @@ public final class Snowman {
         return entity instanceof Display && entity.entityTags().contains(State.PART);
     }
 
+    // ---------------------------------------------------------------- the snowball item
+
+    /** A picked-up snowball: the rolled snowball item, remembering its size. */
+    public static ItemStack ballItem(int size) {
+        ItemStack stack = new ItemStack(SnowmenMod.rolledSnowball.get());
+        CompoundTag tag = new CompoundTag();
+        tag.putInt(ITEM_SIZE, Ball.clamp(size));
+        stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        stack.set(DataComponents.LORE, new ItemLore(List.of(
+                Component.translatable("item.snowmen.rolled_snowball.size", Ball.clamp(size))
+                        .withStyle(s -> s.withItalic(false)).withStyle(ChatFormatting.GRAY),
+                Component.translatable("item.snowmen.rolled_snowball.hint")
+                        .withStyle(s -> s.withItalic(false)).withStyle(ChatFormatting.DARK_GRAY))));
+        return stack;
+    }
+
+    /** Size of a picked-up snowball, or 0 for any other item. */
+    public static int ballSize(ItemStack stack) {
+        if (SnowmenMod.rolledSnowball == null || !stack.is(SnowmenMod.rolledSnowball.get())) {
+            return 0;
+        }
+        CustomData data = stack.get(DataComponents.CUSTOM_DATA);
+        if (data == null) {
+            return 0;
+        }
+        int size = data.copyTag().getIntOr(ITEM_SIZE, 0);
+        return size > 0 ? Ball.clamp(size) : 0;
+    }
+
     // ---------------------------------------------------------------- blocks
+
+    /** The rolled snowball item used on a block: put the snowball down there. */
+    public static InteractionResult place(Level level, BlockPos pos, Direction face, Player player, ItemStack held) {
+        int size = ballSize(held);
+        if (size <= 0 || !SnowmenMod.isModEnabled()) {
+            return InteractionResult.PASS;
+        }
+        if (!(level instanceof ServerLevel server)) {
+            return InteractionResult.SUCCESS;
+        }
+        BlockState state = level.getBlockState(pos);
+        BlockPos at = state.canBeReplaced() || state.getBlock() instanceof SnowLayerBlock ? pos : pos.relative(face);
+        if (!canOccupy(server, at) || rootAt(server, at, null) != null) {
+            sound(server, Vec3.atCenterOf(at), SoundEvents.SNOW_STEP, 0.6f);
+            return InteractionResult.FAIL;
+        }
+        spawn(server, Vec3.atBottomCenterOf(at), State.ball(size), 0);
+        if (player == null || !player.hasInfiniteMaterials()) {
+            held.shrink(1);
+        }
+        sound(server, Vec3.atCenterOf(at), SoundEvents.SNOW_PLACE, 1.0f);
+        return InteractionResult.SUCCESS;
+    }
 
     /** Right-click on a block. Returns null to let vanilla handle it. */
     public static InteractionResult useBlock(BlockState state, Level level, BlockPos pos, Player player,
@@ -87,13 +154,8 @@ public final class Snowman {
         if (!(level instanceof ServerLevel server) || !SnowmenMod.isModEnabled() || player.isSpectator()) {
             return null;
         }
-        Interaction carried = carriedBy(player);
-        if (carried != null) {
-            BlockPos target = state.canBeReplaced() || state.getBlock() instanceof SnowLayerBlock
-                    ? pos : pos.relative(hit.getDirection());
-            return putDown(server, carried, target) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
-        }
-        if (!player.getMainHandItem().isEmpty()) {
+        ItemStack held = player.getMainHandItem();
+        if (!held.isEmpty()) {
             return null;
         }
         BlockPos at;
@@ -129,25 +191,23 @@ public final class Snowman {
         if (!(root.level() instanceof ServerLevel server) || player.isSpectator()) {
             return InteractionResult.SUCCESS;
         }
-        if (hand != InteractionHand.MAIN_HAND || root.entityTags().contains(State.CARRIED)) {
+        if (hand != InteractionHand.MAIN_HAND) {
             return InteractionResult.PASS;
         }
         State s = State.read(root.entityTags());
-        Interaction carried = carriedBy(player);
-        if (carried != null) {
-            return stack(server, root, s, carried, player);
-        }
         ItemStack item = player.getItemInHand(hand);
+        int carried = ballSize(item);
+        if (carried > 0) {
+            return stack(server, root, s, item, carried, player);
+        }
         if (item.isEmpty()) {
             if (player.isSecondaryUseActive()) {
                 return takeOff(server, root, s, player);
             }
             if (s.sizes.length == 1) {
-                if (!Ball.canCarry(s.top())) {
-                    sound(server, root.position(), SoundEvents.SNOW_STEP, 0.6f);
-                    return InteractionResult.FAIL;
-                }
-                carry(server, root, player);
+                give(player, ballItem(s.top()));
+                discard(root);
+                sound(server, root.position(), SoundEvents.SNOW_BREAK, 1.3f);
                 return InteractionResult.SUCCESS;
             }
             return InteractionResult.PASS;
@@ -164,7 +224,7 @@ public final class Snowman {
             return false;
         }
         if (!(root.level() instanceof ServerLevel server) || !(attacker instanceof Player player)
-                || player.isSpectator() || root.entityTags().contains(State.CARRIED)) {
+                || player.isSpectator()) {
             return true;
         }
         State s = State.read(root.entityTags());
@@ -187,12 +247,13 @@ public final class Snowman {
     // ---------------------------------------------------------------- rolling
 
     private static void roll(ServerLevel level, Interaction root, State s, Player player) {
-        if (MOTION.containsKey(root)) {
+        long now = level.getGameTime();
+        Long busy = BUSY.get(root);
+        if (busy != null && now < busy) {
             return;
         }
         Direction dir = Direction.fromYRot(player.getYRot());
-        BlockPos from = root.blockPosition();
-        BlockPos to = from.relative(dir);
+        BlockPos to = root.blockPosition().relative(dir);
         if (!canOccupy(level, to)) {
             if (canOccupy(level, to.below()) && level.getBlockState(to).canBeReplaced()) {
                 to = to.below();
@@ -209,9 +270,8 @@ public final class Snowman {
             return;
         }
         int size = s.top();
-        BlockState there = level.getBlockState(to);
         int max = SnowmenMod.maxBallSize();
-        if (there.getBlock() instanceof SnowLayerBlock) {
+        if (level.getBlockState(to).getBlock() instanceof SnowLayerBlock) {
             size = Math.min(max, size + 1);
             if (SnowmenMod.snowTrail == null || SnowmenMod.snowTrail.get()) {
                 level.removeBlock(to, false);
@@ -220,18 +280,21 @@ public final class Snowman {
                 || level.getBlockState(to.below()).is(Blocks.POWDER_SNOW)) {
             size = Math.min(max, size + 1);
         }
-        Vec3 target = Vec3.atBottomCenterOf(to);
-        float radius = Ball.scale(size) / 2;
+        // Spin around the axis across the direction of travel: one block of travel turns the
+        // ball by (distance / radius) radians, like a real ball rolling.
         Vector3f axis = new Vector3f(dir.getStepZ(), 0, -dir.getStepX());
         Quaternionf spin = SPIN.computeIfAbsent(root, r -> new Quaternionf());
-        new Quaternionf().rotateAxis(1.0f / radius, axis).mul(spin, spin);
-        if (size != s.top()) {
-            s.sizes[0] = size;
-            writeState(root, s);
-            rebuild(level, root);
+        new Quaternionf().rotateAxis(1.0f / (Ball.scale(size) / 2), axis).mul(spin, spin);
+        s.sizes[0] = size;
+        writeState(root, s);
+        Vec3 target = Vec3.atBottomCenterOf(to);
+        root.snapTo(target);
+        resize(root, s);
+        for (Display part : parts(root)) {
+            part.snapTo(target.x, target.y, target.z, 0, 0);
         }
-        layout(root, State.read(root.entityTags()), ROLL_TICKS, 0);
-        MOTION.put(root, new Motion(root.position(), target, new int[] {0}));
+        layout(root, s, ROLL_TICKS, 0);
+        BUSY.put(root, now + ROLL_TICKS - 1);
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SNOW_BLOCK.defaultBlockState()),
                 target.x, target.y + 0.1, target.z, 6, 0.25, 0.05, 0.25, 0.05);
         sound(level, target, SoundEvents.SNOW_STEP, 0.9f + level.getRandom().nextFloat() * 0.2f);
@@ -251,71 +314,26 @@ public final class Snowman {
                 || ground.getBlock() instanceof SnowLayerBlock && ground.getValue(SnowLayerBlock.LAYERS) == 8;
     }
 
-    // ---------------------------------------------------------------- carrying and stacking
+    // ---------------------------------------------------------------- stacking and decorating
 
-    private static Interaction carriedBy(Player player) {
-        Interaction root = CARRYING.get(player.getUUID());
-        if (root != null && (root.isRemoved() || !root.entityTags().contains(State.CARRIED))) {
-            CARRYING.remove(player.getUUID());
-            return null;
-        }
-        return root;
-    }
-
-    private static void carry(ServerLevel level, Interaction root, Player player) {
-        MOTION.remove(root);
-        SPIN.remove(root);
-        root.addTag(State.CARRIED);
-        CARRYING.put(player.getUUID(), root);
-        follow(root, player);
-        rebuild(level, root);
-        sound(level, root.position(), SoundEvents.SNOW_BREAK, 1.3f);
-    }
-
-    /** Puts a carried snowball on top of its carrier's head. */
-    private static void follow(Interaction root, Player player) {
-        root.snapTo(player.getX(), player.getY() + player.getBbHeight() + 0.05, player.getZ());
-    }
-
-    private static Player carrierOf(ServerLevel level, Interaction root) {
-        for (Map.Entry<java.util.UUID, Interaction> e : CARRYING.entrySet()) {
-            if (e.getValue() == root) {
-                Player player = level.getPlayerByUUID(e.getKey());
-                return player != null && player.isAlive() && !player.isRemoved() ? player : null;
-            }
-        }
-        return null;
-    }
-
-    private static boolean putDown(ServerLevel level, Interaction carried, BlockPos pos) {
-        if (!canOccupy(level, pos) || rootAt(level, pos, carried) != null) {
-            sound(level, Vec3.atCenterOf(pos), SoundEvents.SNOW_STEP, 0.6f);
-            return false;
-        }
-        CARRYING.values().remove(carried);
-        carried.removeTag(State.CARRIED);
-        carried.snapTo(Vec3.atBottomCenterOf(pos));
-        rebuild(level, carried);
-        sound(level, Vec3.atCenterOf(pos), SoundEvents.SNOW_PLACE, 1.0f);
-        return true;
-    }
-
-    private static InteractionResult stack(ServerLevel level, Interaction root, State s, Interaction carried,
+    private static InteractionResult stack(ServerLevel level, Interaction root, State s, ItemStack item, int size,
             Player player) {
-        State c = State.read(carried.entityTags());
-        if (c.sizes.length != 1 || s.decorated() || !Ball.canStack(s.sizes, c.top())) {
+        if (s.decorated() || !Ball.canStack(s.sizes, size)) {
             sound(level, root.position(), SoundEvents.SNOW_STEP, 0.6f);
             return InteractionResult.FAIL;
         }
         int[] sizes = new int[s.sizes.length + 1];
         System.arraycopy(s.sizes, 0, sizes, 0, s.sizes.length);
-        sizes[s.sizes.length] = c.top();
+        sizes[s.sizes.length] = size;
         s.sizes = sizes;
-        discard(carried);
+        if (!player.hasInfiniteMaterials()) {
+            item.shrink(1);
+        }
         if (s.complete()) {
             // A finished snowman turns to face whoever built it.
             root.setYRot(player.getYRot() + 180);
         }
+        SPIN.remove(root);
         writeState(root, s);
         rebuild(level, root);
         Vec3 top = root.position().add(0, Ball.height(s.sizes), 0);
@@ -327,9 +345,9 @@ public final class Snowman {
         return InteractionResult.SUCCESS;
     }
 
-    /** Sneak + empty hand: take off the last decoration, or lift the top snowball off. */
+    /** Sneak + empty hand: take off the last decoration, or the top snowball. */
     private static InteractionResult takeOff(ServerLevel level, Interaction root, State s, Player player) {
-        ItemStack back = ItemStack.EMPTY;
+        ItemStack back;
         if (s.hat) {
             back = hatOf(root);
             s.hat = false;
@@ -348,21 +366,17 @@ public final class Snowman {
         } else if (s.eyes) {
             s.eyes = false;
             back = new ItemStack(Items.COAL);
-        } else if (s.sizes.length > 1) {
-            if (carriedBy(player) != null || !Ball.canCarry(s.top())) {
-                return InteractionResult.FAIL;
+        } else {
+            back = ballItem(s.top());
+            if (s.sizes.length == 1) {
+                give(player, back);
+                discard(root);
+                sound(level, root.position(), SoundEvents.SNOW_BREAK, 1.3f);
+                return InteractionResult.SUCCESS;
             }
-            int top = s.top();
             int[] sizes = new int[s.sizes.length - 1];
             System.arraycopy(s.sizes, 0, sizes, 0, sizes.length);
             s.sizes = sizes;
-            writeState(root, s);
-            rebuild(level, root);
-            Interaction ball = spawn(level, root.position(), State.ball(top), 0);
-            carry(level, ball, player);
-            return InteractionResult.SUCCESS;
-        } else {
-            return InteractionResult.PASS;
         }
         writeState(root, s);
         rebuild(level, root);
@@ -394,7 +408,8 @@ public final class Snowman {
             }
             s.scarf = carpet.getColor().getSerializedName();
             sound = SoundEvents.WOOL_PLACE;
-        } else if (item.is(Items.COAL) || item.is(Items.CARROT) || item.is(Items.STICK) || item.is(Items.SNOWBALL)) {
+        } else if (item.is(Items.COAL) || item.is(Items.CHARCOAL) || item.is(Items.CARROT) || item.is(Items.STICK)
+                || item.is(Items.SNOWBALL)) {
             return InteractionResult.PASS;
         } else {
             if (s.hat) {
@@ -420,37 +435,90 @@ public final class Snowman {
         if (!(root.level() instanceof ServerLevel level) || !isRoot(root)) {
             return;
         }
-        Motion motion = MOTION.get(root);
-        if (motion != null) {
-            int step = ++motion.step()[0];
-            double t = Math.min(1.0, step / (double) ROLL_TICKS);
-            root.snapTo(motion.from().lerp(motion.to(), t));
-            if (step >= ROLL_TICKS) {
-                MOTION.remove(root);
-            }
-        }
         int[] wobble = WOBBLE.get(root);
         if (wobble != null && --wobble[0] <= 0) {
             WOBBLE.remove(root);
             layout(root, State.read(root.entityTags()), 3, 0);
         }
-        if (root.entityTags().contains(State.CARRIED)) {
-            Player carrier = carrierOf(level, root);
-            if (carrier != null) {
-                follow(root, carrier);
-            } else {
-                // The carrier is gone (logged out, died, other dimension, restart): set it down here.
-                CARRYING.values().remove(root);
-                root.removeTag(State.CARRIED);
-                root.snapTo(Vec3.atBottomCenterOf(ground(level, root.blockPosition())));
-                rebuild(level, root);
-            }
-            return;
-        }
         if (root.tickCount % MELT_TICKS == 0 && root.tickCount > 0
-                && (SnowmenMod.melting == null || SnowmenMod.melting.get()) && melts(level, root)) {
+                && (SnowmenMod.melting == null || SnowmenMod.melting.get()) && melts(level, root)
+                && !isTopHat(hatOf(root))) {
             melt(level, root);
         }
+        if (root.tickCount % HINT_TICKS == 0 && (SnowmenMod.rotateHint == null || SnowmenMod.rotateHint.get())) {
+            hint(level, root);
+        }
+    }
+
+    /** Tells players standing next to a finished snowman that they can turn it. */
+    private static void hint(ServerLevel level, Interaction root) {
+        if (!State.read(root.entityTags()).complete() || SnowmenMod.rotate == null) {
+            return;
+        }
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(root) <= HINT_RANGE * HINT_RANGE && !player.isSpectator()) {
+                player.sendOverlayMessage(Component.translatableWithFallback("snowmen.hint.rotate",
+                        "Press %s to turn the snowman", Component.keybind("key.snowmen.rotate")));
+            }
+        }
+    }
+
+    /** The rotate key: turns the finished snowman the player looks at, or the closest one. */
+    public static void rotateNear(ServerPlayer player, boolean back) {
+        if (player == null || !(player.level() instanceof ServerLevel level) || player.isSpectator()) {
+            return;
+        }
+        Interaction best = null;
+        double bestScore = Double.MAX_VALUE;
+        Vec3 eye = player.getEyePosition();
+        Vec3 look = player.getLookAngle();
+        for (Interaction root : level.getEntitiesOfClass(Interaction.class,
+                player.getBoundingBox().inflate(ROTATE_RANGE))) {
+            if (!isRoot(root) || !State.read(root.entityTags()).complete()) {
+                continue;
+            }
+            Vec3 to = root.position().add(0, 1, 0).subtract(eye);
+            double distance = to.length();
+            if (distance > ROTATE_RANGE + 1) {
+                continue;
+            }
+            // Prefer the snowman in the middle of the view, then the closest.
+            double score = distance * (2 - to.normalize().dot(look));
+            if (score < bestScore) {
+                bestScore = score;
+                best = root;
+            }
+        }
+        if (best == null) {
+            return;
+        }
+        best.setYRot(best.getYRot() + (back ? -ROTATE_STEP : ROTATE_STEP));
+        layout(best, State.read(best.entityTags()), 6, 0);
+        sound(level, best.position().add(0, 1, 0), SoundEvents.SNOW_STEP, 1.2f);
+    }
+
+    private static boolean isTopHat(ItemStack stack) {
+        return SnowmenMod.topHat != null && !stack.isEmpty() && stack.is(SnowmenMod.topHat.get());
+    }
+
+    /** Displays whose snowman is gone (killed by a command, say) clean themselves up. */
+    public static void partTick(Display display) {
+        if (display.tickCount % 100 != 50 || !(display.level() instanceof ServerLevel level) || !isPart(display)) {
+            return;
+        }
+        for (String tag : display.entityTags()) {
+            if (tag.startsWith(OWNER)) {
+                try {
+                    Entity root = level.getEntity(UUID.fromString(tag.substring(OWNER.length())));
+                    if (root != null && isRoot(root) && !root.isRemoved()) {
+                        return;
+                    }
+                } catch (IllegalArgumentException ignored) {
+                    // A broken tag: the display belongs to nothing.
+                }
+            }
+        }
+        display.discard();
     }
 
     private static boolean melts(ServerLevel level, Interaction root) {
@@ -468,17 +536,10 @@ public final class Snowman {
             }
         }
         writeState(root, s);
-        rebuild(level, root);
+        resize(root, s);
+        layout(root, s, 20, 0);
         level.sendParticles(ParticleTypes.FALLING_WATER, root.getX(), root.getY() + Ball.height(s.sizes) * 0.5,
                 root.getZ(), 6, 0.3, 0.3, 0.3, 0);
-    }
-
-    private static BlockPos ground(ServerLevel level, BlockPos start) {
-        BlockPos pos = start;
-        for (int i = 0; i < 16 && !canOccupy(level, pos); i++) {
-            pos = pos.below();
-        }
-        return canOccupy(level, pos) ? pos : start;
     }
 
     // ---------------------------------------------------------------- building the looks
@@ -505,6 +566,31 @@ public final class Snowman {
         }
     }
 
+    private static void resize(Interaction root, State s) {
+        InteractionAccessor box = (InteractionAccessor) root;
+        box.snowmen$setWidth(s.sizes.length == 0 ? 0 : Ball.scale(s.sizes[0]));
+        box.snowmen$setHeight(Ball.height(s.sizes));
+        root.refreshDimensions();
+    }
+
+    /** The displays of a root, found by their owner tag once and then remembered. */
+    private static List<Display> parts(Interaction root) {
+        List<Display> cached = PARTS.get(root);
+        if (cached != null) {
+            cached.removeIf(Entity::isRemoved);
+            if (!cached.isEmpty()) {
+                return cached;
+            }
+        }
+        String owner = OWNER + root.getUUID();
+        List<Display> found = new ArrayList<>(root.level().getEntitiesOfClass(Display.class,
+                new AABB(root.getX() - 1, root.getY() - 1, root.getZ() - 1, root.getX() + 1, root.getY() + 1,
+                        root.getZ() + 1),
+                d -> d.entityTags().contains(owner)));
+        PARTS.put(root, found);
+        return found;
+    }
+
     /** Throws away the displays of a root and creates them again from its state. */
     static void rebuild(ServerLevel level, Interaction root) {
         State s = State.read(root.entityTags());
@@ -513,19 +599,13 @@ public final class Snowman {
             hat = hatOf(root);
         }
         s.hatBlock = hat.getItem() instanceof BlockItem;
-        for (Entity part : new ArrayList<>(root.getPassengers())) {
-            if (isPart(part)) {
-                part.stopRiding();
-                part.discard();
-            }
+        s.hatTop = isTopHat(hat);
+        for (Display part : parts(root)) {
+            part.discard();
         }
-        boolean carried = root.entityTags().contains(State.CARRIED);
-        float height = carried ? 0 : Ball.height(s.sizes);
-        InteractionAccessor box = (InteractionAccessor) root;
-        box.snowmen$setWidth(carried || s.sizes.length == 0 ? 0 : Ball.scale(s.sizes[0]));
-        box.snowmen$setHeight(height);
-        root.refreshDimensions();
-        for (Layout.Piece piece : Layout.pieces(s, -height, root.getYRot(), SPIN.get(root))) {
+        resize(root, s);
+        List<Display> made = new ArrayList<>();
+        for (Layout.Piece piece : Layout.pieces(s, 0, root.getYRot(), SPIN.get(root))) {
             Display display;
             if (piece.block()) {
                 Display.BlockDisplay block = new Display.BlockDisplay(Compat.blockDisplay(), level);
@@ -534,45 +614,50 @@ public final class Snowman {
             } else {
                 Display.ItemDisplay item = new Display.ItemDisplay(Compat.itemDisplay(), level);
                 ItemStack stack = piece.kind() == Layout.Kind.HAT ? hat : new ItemStack(Items.STICK);
-                ((ItemDisplayAccessor) item).snowmen$setItemStack(stack == null ? ItemStack.EMPTY : stack);
+                ((ItemDisplayAccessor) item).snowmen$setItemStack(stack);
                 ((ItemDisplayAccessor) item).snowmen$setItemTransform(
                         piece.kind() == Layout.Kind.HAT && s.hatBlock ? ItemDisplayContext.HEAD : ItemDisplayContext.NONE);
                 display = item;
             }
-            display.snapTo(root.getX(), root.getY() + height, root.getZ(), 0, 0);
+            display.snapTo(root.getX(), root.getY(), root.getZ(), 0, 0);
             display.addTag(State.PART);
+            display.addTag(OWNER + root.getUUID());
             display.addTag(partTag(piece));
             DisplayAccessor d = (DisplayAccessor) display;
             d.snowmen$setTransformation(new Transformation(piece.matrix()));
-            if (piece.kind() == Layout.Kind.BALL && piece.index() == 0 && !carried) {
+            d.snowmen$setPosRotInterpolationDuration(ROLL_TICKS);
+            if (piece.kind() == Layout.Kind.BALL && piece.index() == 0) {
                 d.snowmen$setShadowRadius(Ball.scale(s.sizes[0]) * 0.45f);
             }
             level.addFreshEntity(display);
-            display.startRiding(root, true, true);
+            made.add(display);
         }
+        PARTS.put(root, made);
     }
 
     /** Moves the existing displays to a new layout, animated over {@code ticks}. */
     private static void layout(Interaction root, State s, int ticks, float extraYaw) {
-        Map<String, Display> parts = new HashMap<>();
-        for (Entity part : root.getPassengers()) {
-            if (part instanceof Display display && isPart(part)) {
-                for (String tag : part.entityTags()) {
-                    if (tag.startsWith(State.PART + ".")) {
-                        parts.put(tag, display);
-                    }
+        Map<String, Display> byTag = new HashMap<>();
+        for (Display part : parts(root)) {
+            for (String tag : part.entityTags()) {
+                if (tag.startsWith(State.PART + ".")) {
+                    byTag.put(tag, part);
                 }
             }
         }
-        float height = root.entityTags().contains(State.CARRIED) ? 0 : Ball.height(s.sizes);
-        s.hatBlock = hatOf(root).getItem() instanceof BlockItem;
-        for (Layout.Piece piece : Layout.pieces(s, -height, root.getYRot() + extraYaw, SPIN.get(root))) {
-            Display display = parts.get(partTag(piece));
+        ItemStack hat = hatOf(root);
+        s.hatBlock = hat.getItem() instanceof BlockItem;
+        s.hatTop = isTopHat(hat);
+        for (Layout.Piece piece : Layout.pieces(s, 0, root.getYRot() + extraYaw, SPIN.get(root))) {
+            Display display = byTag.get(partTag(piece));
             if (display != null) {
                 DisplayAccessor d = (DisplayAccessor) display;
                 d.snowmen$setInterpolationDelay(0);
                 d.snowmen$setInterpolationDuration(ticks);
                 d.snowmen$setTransformation(new Transformation(piece.matrix()));
+                if (piece.kind() == Layout.Kind.BALL && piece.index() == 0) {
+                    d.snowmen$setShadowRadius(Ball.scale(s.sizes[0]) * 0.45f);
+                }
             }
         }
     }
@@ -584,20 +669,20 @@ public final class Snowman {
     }
 
     private static String partTag(Layout.Piece piece) {
-        return State.PART + "." + piece.kind().name().toLowerCase(java.util.Locale.ROOT) + "." + piece.index();
+        return State.PART + "." + piece.kind().name().toLowerCase(Locale.ROOT) + "." + piece.index();
     }
 
     private static BlockState blockFor(Layout.Kind kind, State s) {
         return switch (kind) {
             case EYE, BUTTON -> Blocks.COAL_BLOCK.defaultBlockState();
             case NOSE -> Compat.orangeConcrete().defaultBlockState();
-            case SCARF -> wool(s.scarf);
+            case SCARF -> Compat.wool(dye(s.scarf)).defaultBlockState();
             default -> Blocks.SNOW_BLOCK.defaultBlockState();
         };
     }
 
     private static ItemStack hatOf(Interaction root) {
-        for (Entity part : root.getPassengers()) {
+        for (Display part : parts(root)) {
             if (part instanceof Display.ItemDisplay item && part.entityTags().contains(State.PART + ".hat.0")) {
                 return ((ItemDisplayAccessor) item).snowmen$getItemStack().copy();
             }
@@ -651,14 +736,11 @@ public final class Snowman {
     }
 
     private static void discard(Interaction root) {
-        for (Entity part : new ArrayList<>(root.getPassengers())) {
-            if (isPart(part)) {
-                part.stopRiding();
-                part.discard();
-            }
+        for (Display part : parts(root)) {
+            part.discard();
         }
-        CARRYING.values().remove(root);
-        MOTION.remove(root);
+        PARTS.remove(root);
+        BUSY.remove(root);
         SPIN.remove(root);
         root.discard();
     }
@@ -667,7 +749,7 @@ public final class Snowman {
 
     private static Interaction rootAt(ServerLevel level, BlockPos pos, Interaction except) {
         for (Interaction other : level.getEntitiesOfClass(Interaction.class, new AABB(pos).inflate(-0.05))) {
-            if (other != except && isRoot(other) && !other.entityTags().contains(State.CARRIED)) {
+            if (other != except && isRoot(other)) {
                 return other;
             }
         }
@@ -691,10 +773,6 @@ public final class Snowman {
             }
         }
         return DyeColor.RED;
-    }
-
-    private static BlockState wool(String name) {
-        return Compat.wool(dye(name)).defaultBlockState();
     }
 
     private static Block carpet(String name) {

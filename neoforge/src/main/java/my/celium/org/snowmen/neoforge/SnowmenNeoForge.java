@@ -12,11 +12,11 @@ import net.neoforged.fml.loading.FMLEnvironment;
  */
 @Mod(SnowmenMod.ID)
 public final class SnowmenNeoForge {
-    public SnowmenNeoForge(@SuppressWarnings("unused") IEventBus modBus,
+    public SnowmenNeoForge(IEventBus modBus,
             @SuppressWarnings("unused") ModContainer container) {
         SnowmenMod.init();
         if (FMLEnvironment.getDist().isClient()) {
-            ClientSnowmen.register();
+            ClientSnowmen.register(modBus);
         }
     }
 }

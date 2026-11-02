@@ -16,6 +16,9 @@ public interface DisplayAccessor {
     @Invoker("setTransformationInterpolationDelay")
     void snowmen$setInterpolationDelay(int ticks);
 
+    @Invoker("setPosRotInterpolationDuration")
+    void snowmen$setPosRotInterpolationDuration(int ticks);
+
     @Invoker("setShadowRadius")
     void snowmen$setShadowRadius(float radius);
 }

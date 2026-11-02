@@ -4,8 +4,6 @@ package my.celium.org.snowmen;
 public final class Ball {
     public static final int MIN_SIZE = 1;
     public static final int MAX_SIZE = 16;
-    /** Biggest snowball a player can still lift over their head. */
-    public static final int CARRY_MAX = 10;
     /** How much of the ball below a stacked ball sinks into. */
     public static final float OVERLAP = 0.15f;
 
@@ -19,10 +17,6 @@ public final class Ball {
 
     public static int clamp(int size) {
         return Math.max(MIN_SIZE, Math.min(MAX_SIZE, size));
-    }
-
-    public static boolean canCarry(int size) {
-        return size <= CARRY_MAX;
     }
 
     /** Height of the centre of ball {@code index} above the ground, for a stack of these sizes. */

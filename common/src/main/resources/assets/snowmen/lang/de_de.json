@@ -1,0 +1,9 @@
+{
+  "item.snowmen.rolled_snowball": "Gerollter Schneeball",
+  "item.snowmen.rolled_snowball.size": "Größe %s",
+  "item.snowmen.rolled_snowball.hint": "Auf den Boden oder einen größeren Schneeball setzen",
+  "item.snowmen.top_hat": "Zylinder",
+  "item.snowmen.top_hat.hint": "Ein Schneemann damit schmilzt nie",
+  "key.snowmen.rotate": "Schneemann drehen",
+  "snowmen.hint.rotate": "Drücke %s, um den Schneemann zu drehen"
+}

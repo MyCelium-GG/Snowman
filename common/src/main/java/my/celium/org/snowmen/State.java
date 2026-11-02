@@ -12,7 +12,6 @@ public final class State {
     static final String PREFIX = "snowmen.";
     public static final String ROOT = PREFIX + "root";
     public static final String PART = PREFIX + "part";
-    public static final String CARRIED = PREFIX + "carried";
 
     public int[] sizes = new int[0];
     public boolean eyes;
@@ -25,6 +24,8 @@ public final class State {
     public boolean hat;
     /** Whether the hat is a block (worn over the head like a pumpkin) or a flat item on top. Not saved. */
     public boolean hatBlock;
+    /** Whether the hat is the mod's own top hat, which sits flat on top. Not saved. */
+    public boolean hatTop;
 
     public static State ball(int size) {
         State s = new State();
@@ -79,7 +80,7 @@ public final class State {
         return s;
     }
 
-    /** The state tags; {@link #ROOT}, {@link #CARRIED} and part tags are managed elsewhere. */
+    /** The state tags; {@link #ROOT} and part tags are managed elsewhere. */
     public List<String> tags() {
         List<String> out = new ArrayList<>();
         for (int i = 0; i < sizes.length; i++) {
@@ -108,7 +109,7 @@ public final class State {
 
     /** True for tags written by {@link #tags()}, so old ones can be removed before writing. */
     public static boolean isStateTag(String tag) {
-        return tag.startsWith(PREFIX) && !tag.equals(ROOT) && !tag.equals(CARRIED) && !tag.startsWith(PART);
+        return tag.startsWith(PREFIX) && !tag.equals(ROOT) && !tag.startsWith(PART) && !tag.startsWith(PREFIX + "of=");
     }
 
     private static int parse(String value, int fallback) {

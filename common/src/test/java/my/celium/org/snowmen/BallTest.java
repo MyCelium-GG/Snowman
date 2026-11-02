@@ -34,10 +34,4 @@ class BallTest {
         assertFalse(Ball.canStack(new int[] {12, 8, 5}, 2));
         assertFalse(Ball.canStack(new int[0], 2));
     }
-
-    @Test
-    void bigBallsAreTooHeavyToCarry() {
-        assertTrue(Ball.canCarry(Ball.CARRY_MAX));
-        assertFalse(Ball.canCarry(Ball.CARRY_MAX + 1));
-    }
 }

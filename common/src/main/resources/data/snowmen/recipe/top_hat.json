@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " B ",
+    " R ",
+    "BBB"
+  ],
+  "key": {
+    "B": "minecraft:black_wool",
+    "R": "minecraft:red_dye"
+  },
+  "result": {
+    "id": "snowmen:top_hat",
+    "count": 1
+  }
+}

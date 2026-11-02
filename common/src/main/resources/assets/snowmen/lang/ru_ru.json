@@ -1,0 +1,9 @@
+{
+  "item.snowmen.rolled_snowball": "Скатанный снежный ком",
+  "item.snowmen.rolled_snowball.size": "Размер %s",
+  "item.snowmen.rolled_snowball.hint": "Поставьте на землю или на ком побольше",
+  "item.snowmen.top_hat": "Цилиндр",
+  "item.snowmen.top_hat.hint": "Снеговик в нём никогда не тает",
+  "key.snowmen.rotate": "Повернуть снеговика",
+  "snowmen.hint.rotate": "Нажмите %s, чтобы повернуть снеговика"
+}

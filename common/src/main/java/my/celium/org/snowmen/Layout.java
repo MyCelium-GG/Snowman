@@ -106,7 +106,12 @@ public final class Layout {
         }
         if (s.hat) {
             Matrix4f m;
-            if (s.hatBlock) {
+            if (s.hatTop) {
+                // The top hat's model is a full block: brim at the bottom, centred on the origin.
+                float size = headW * 1.15f;
+                m = new Matrix4f(frame).translate(0, headY + headR * 0.92f + size * 0.5f, 0)
+                        .rotateZ((float) Math.toRadians(-6)).scale(size);
+            } else if (s.hatBlock) {
                 // Blocks use the "worn on the head" model, which sits over the head like a pumpkin.
                 m = new Matrix4f(frame).translate(0, headY + headR * 0.95f, 0).scale(headW * 1.25f);
             } else {

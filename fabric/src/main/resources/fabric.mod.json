@@ -13,6 +13,9 @@
   "entrypoints": {
     "main": [
       "my.celium.org.snowmen.fabric.SnowmenFabric"
+    ],
+    "client": [
+      "my.celium.org.snowmen.fabric.SnowmenFabricClient"
     ]
   },
   "mixins": [

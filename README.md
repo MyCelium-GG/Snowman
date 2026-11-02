@@ -4,19 +4,29 @@ Build your own snowman. Roll a snowball through the snow until it is big enough,
 
 - **Pack a snowball:** right-click snow with an empty hand.
 - **Roll it:** hit it. It rolls one block the way you face, picks up the snow it rolls over and grows. Rolling leaves a trail of bare ground.
-- **Carry it:** right-click a snowball to lift it over your head, right-click the ground to put it down. Snowballs up to size 10 are light enough to carry.
-- **Stack it:** carry a smaller snowball to a bigger one and right-click. Three make a snowman, and it turns to face you.
+- **Pick it up:** right-click a snowball with an empty hand. It becomes a Rolled Snowball item that keeps its size. Right-click the ground to put it down again.
+- **Stack it:** right-click a bigger snowball while holding a smaller Rolled Snowball. Three make a snowman, and it turns to face you.
+- **Turn it:** stand next to a finished snowman and press **R** (sneak + R turns the other way). The key can be changed in Controls.
 - **Decorate it:** right-click the snowman with
   - coal or charcoal: eyes first, then up to three buttons
   - a carrot: the nose
   - sticks: up to two arms
   - any carpet: a scarf in that colour
+  - a **Top Hat**: crafted from black wool and red dye. A snowman wearing one never melts.
   - anything else: a hat. Blocks like a carved pumpkin go over the head, items like a bucket sit on top.
 - **Take things off:** sneak and right-click with an empty hand. Decorations come off one at a time, then the top snowball.
 - **Knock it over:** hit a snowman twice quickly. You get the snow and every decoration back.
-- **Melting:** snowmen slowly melt where a snow golem would, like deserts and the Nether.
+- **Melting:** snowmen slowly melt where a snow golem would, like deserts and the Nether, unless they wear a Top Hat.
 
-Snowmen are made of vanilla display entities, so the mod adds no blocks, items or textures, and only the server does the work. Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3.
+### Top Hat recipe
+
+```
+ B       B = black wool
+ R       R = red dye
+BBB
+```
+
+Snowmen are made of vanilla display entities. The mod adds two items, the Rolled Snowball and the Top Hat, so it is needed on both the server and the client. Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3.
 
 ## Settings
 
@@ -25,6 +35,7 @@ Snowmen are made of vanilla display entities, so the mod adds no blocks, items o
 | Melting | On | Snowmen slowly shrink and finally fall apart where a snow golem would melt |
 | Max ball size | 16 | How big a snowball can grow while rolling |
 | Snow trail | On | Rolling picks up the snow and leaves bare ground behind |
+| Rotate hint | On | Shows "Press R to turn the snowman" above the hotbar next to a finished snowman |
 
 ## Build
 

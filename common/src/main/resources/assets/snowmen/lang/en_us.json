@@ -1,0 +1,9 @@
+{
+  "item.snowmen.rolled_snowball": "Rolled Snowball",
+  "item.snowmen.rolled_snowball.size": "Size %s",
+  "item.snowmen.rolled_snowball.hint": "Place it on the ground or on a bigger snowball",
+  "item.snowmen.top_hat": "Top Hat",
+  "item.snowmen.top_hat.hint": "A snowman wearing it never melts",
+  "key.snowmen.rotate": "Rotate snowman",
+  "snowmen.hint.rotate": "Press %s to turn the snowman"
+}

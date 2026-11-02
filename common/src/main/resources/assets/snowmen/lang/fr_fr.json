@@ -1,0 +1,9 @@
+{
+  "item.snowmen.rolled_snowball": "Boule de neige roulée",
+  "item.snowmen.rolled_snowball.size": "Taille %s",
+  "item.snowmen.rolled_snowball.hint": "Pose-la au sol ou sur une boule de neige plus grosse",
+  "item.snowmen.top_hat": "Haut-de-forme",
+  "item.snowmen.top_hat.hint": "Un bonhomme de neige qui le porte ne fond jamais",
+  "key.snowmen.rotate": "Tourner le bonhomme de neige",
+  "snowmen.hint.rotate": "Appuie sur %s pour tourner le bonhomme de neige"
+}
