@@ -109,9 +109,8 @@ public final class Snowman {
         stack.set(DataComponents.CUSTOM_MODEL_DATA,
                 new CustomModelData(List.of((float) Ball.clamp(size)), List.of(), List.of(), List.of()));
         stack.set(DataComponents.LORE, new ItemLore(List.of(
-                Component.literal("\u2744 ").withStyle(st -> st.withItalic(false).withColor(Ice.FROST))
-                        .append(Component.translatable("item.snowmen.rolled_snowball.size", Ball.clamp(size))
-                                .withStyle(st -> st.withColor(Ice.ICE))),
+                Component.translatable("item.snowmen.rolled_snowball.size", Ball.clamp(size))
+                        .withStyle(st -> st.withItalic(false).withColor(Ice.ICE)),
                 Component.translatable("item.snowmen.rolled_snowball.hint")
                         .withStyle(st -> st.withItalic(false).withColor(Ice.DEEP)))));
         return stack;
