@@ -11,7 +11,8 @@ class BallTest {
     void sizesGrowAndClamp() {
         assertEquals(0.36f, Ball.scale(1), 1e-5);
         assertEquals(1.26f, Ball.scale(16), 1e-5);
-        assertEquals(Ball.scale(16), Ball.scale(40), 1e-5);
+        assertEquals(0.30f + 0.06f * 400, Ball.scale(400), 1e-3);
+        assertEquals(400, Ball.clamp(400));
         assertEquals(Ball.scale(1), Ball.scale(-3), 1e-5);
     }
 

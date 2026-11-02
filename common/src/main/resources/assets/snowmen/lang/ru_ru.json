@@ -5,5 +5,21 @@
   "item.snowmen.top_hat": "Цилиндр",
   "item.snowmen.top_hat.hint": "Снеговик в нём никогда не тает",
   "key.snowmen.rotate": "Повернуть снеговика",
-  "snowmen.hint.rotate": "Нажмите %s, чтобы повернуть снеговика"
+  "snowmen.hint.rotate": "Нажмите %s, чтобы повернуть снеговика",
+  "subtitles.snowmen.ball.pack": "Снежок слеплен",
+  "subtitles.snowmen.ball.roll": "Снежный ком катится",
+  "subtitles.snowmen.ball.grow": "Снежный ком растёт",
+  "subtitles.snowmen.ball.pickup": "Снежный ком поднят",
+  "subtitles.snowmen.ball.place": "Снежный ком поставлен",
+  "subtitles.snowmen.ball.stack": "Снежный ком поставлен сверху",
+  "subtitles.snowmen.snowman.complete": "Снеговик готов",
+  "subtitles.snowmen.snowman.sparkle": "Снег искрится",
+  "subtitles.snowmen.snowman.decorate": "Снеговик украшен",
+  "subtitles.snowmen.snowman.scarf": "Шарф повязан",
+  "subtitles.snowmen.snowman.hat": "Шляпа надета",
+  "subtitles.snowmen.snowman.rotate": "Снеговик поворачивается",
+  "subtitles.snowmen.snowman.hit": "Снеговик качается",
+  "subtitles.snowmen.snowman.break": "Снеговик разваливается",
+  "subtitles.snowmen.snowman.melt": "Снеговик тает",
+  "subtitles.snowmen.deny": "Снег хрустит"
 }

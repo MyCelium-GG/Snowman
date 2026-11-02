@@ -5,5 +5,21 @@
   "item.snowmen.top_hat": "Cartola",
   "item.snowmen.top_hat.hint": "Um boneco de neve com ela nunca derrete",
   "key.snowmen.rotate": "Girar boneco de neve",
-  "snowmen.hint.rotate": "Aperte %s para girar o boneco de neve"
+  "snowmen.hint.rotate": "Aperte %s para girar o boneco de neve",
+  "subtitles.snowmen.ball.pack": "Bola de neve formada",
+  "subtitles.snowmen.ball.roll": "Bola de neve rola",
+  "subtitles.snowmen.ball.grow": "Bola de neve cresce",
+  "subtitles.snowmen.ball.pickup": "Bola de neve pega",
+  "subtitles.snowmen.ball.place": "Bola de neve colocada",
+  "subtitles.snowmen.ball.stack": "Bola de neve empilhada",
+  "subtitles.snowmen.snowman.complete": "Boneco de neve pronto",
+  "subtitles.snowmen.snowman.sparkle": "A neve brilha",
+  "subtitles.snowmen.snowman.decorate": "Boneco de neve enfeitado",
+  "subtitles.snowmen.snowman.scarf": "Cachecol amarrado",
+  "subtitles.snowmen.snowman.hat": "Chapéu colocado",
+  "subtitles.snowmen.snowman.rotate": "Boneco de neve gira",
+  "subtitles.snowmen.snowman.hit": "Boneco de neve balança",
+  "subtitles.snowmen.snowman.break": "Boneco de neve desmorona",
+  "subtitles.snowmen.snowman.melt": "Boneco de neve derrete",
+  "subtitles.snowmen.deny": "A neve range"
 }

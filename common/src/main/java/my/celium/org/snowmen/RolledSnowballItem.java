@@ -1,7 +1,10 @@
 package my.celium.org.snowmen;
 
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 
 /**
@@ -17,5 +20,11 @@ public class RolledSnowballItem extends Item {
     public InteractionResult useOn(UseOnContext context) {
         return Snowman.place(context.getLevel(), context.getClickedPos(), context.getClickedFace(),
                 context.getPlayer(), context.getItemInHand());
+    }
+
+    /** An icy name, in the player's language. */
+    @Override
+    public Component getName(ItemStack stack) {
+        return Ice.gradient(Language.getInstance().getOrDefault(getDescriptionId(), "Rolled Snowball"));
     }
 }

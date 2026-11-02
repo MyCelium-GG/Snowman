@@ -12,8 +12,9 @@ import my.celium.org.snowmen.mixin.BlockDisplayAccessor;
 import my.celium.org.snowmen.mixin.DisplayAccessor;
 import my.celium.org.snowmen.mixin.InteractionAccessor;
 import my.celium.org.snowmen.mixin.ItemDisplayAccessor;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -23,7 +24,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -37,6 +37,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -74,6 +75,8 @@ public final class Snowman {
     /** How far away the rotate key reaches, and how far one press turns. */
     private static final double ROTATE_RANGE = 5;
     private static final float ROTATE_STEP = 45;
+    /** Snowballs dropped when a giant snowman falls apart, at most. */
+    private static final int MAX_SNOW_DROPS = 64;
 
     private static final Map<Interaction, Long> BUSY = new WeakHashMap<>();
     private static final Map<Interaction, Quaternionf> SPIN = new WeakHashMap<>();
@@ -102,12 +105,32 @@ public final class Snowman {
         CompoundTag tag = new CompoundTag();
         tag.putInt(ITEM_SIZE, Ball.clamp(size));
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        // The item model picks a bigger or smaller ball from this number (assets/snowmen/items).
+        stack.set(DataComponents.CUSTOM_MODEL_DATA,
+                new CustomModelData(List.of((float) Ball.clamp(size)), List.of(), List.of(), List.of()));
         stack.set(DataComponents.LORE, new ItemLore(List.of(
-                Component.translatable("item.snowmen.rolled_snowball.size", Ball.clamp(size))
-                        .withStyle(s -> s.withItalic(false)).withStyle(ChatFormatting.GRAY),
+                Component.literal("\u2744 ").withStyle(st -> st.withItalic(false).withColor(Ice.FROST))
+                        .append(Component.translatable("item.snowmen.rolled_snowball.size", Ball.clamp(size))
+                                .withStyle(st -> st.withColor(Ice.ICE))),
                 Component.translatable("item.snowmen.rolled_snowball.hint")
-                        .withStyle(s -> s.withItalic(false)).withStyle(ChatFormatting.DARK_GRAY))));
+                        .withStyle(st -> st.withItalic(false).withColor(Ice.DEEP)))));
         return stack;
+    }
+
+    /** The Top Hat and a range of snowball sizes for the creative menu. */
+    public static List<ItemStack> creativeItems() {
+        List<ItemStack> out = new ArrayList<>();
+        if (SnowmenMod.topHat == null || SnowmenMod.rolledSnowball == null) {
+            return out;
+        }
+        out.add(new ItemStack(SnowmenMod.topHat.get()));
+        for (int size = Ball.MIN_SIZE; size <= Ball.MAX_SIZE; size++) {
+            out.add(ballItem(size));
+        }
+        for (int size : new int[] {20, 24, 32, 48, 64, 100}) {
+            out.add(ballItem(size));
+        }
+        return out;
     }
 
     /** Size of a picked-up snowball, or 0 for any other item. */
@@ -137,14 +160,14 @@ public final class Snowman {
         BlockState state = level.getBlockState(pos);
         BlockPos at = state.canBeReplaced() || state.getBlock() instanceof SnowLayerBlock ? pos : pos.relative(face);
         if (!canOccupy(server, at) || rootAt(server, at, null) != null) {
-            sound(server, Vec3.atCenterOf(at), SoundEvents.SNOW_STEP, 0.6f);
+            sound(server, Vec3.atCenterOf(at), "deny", 1.0f);
             return InteractionResult.FAIL;
         }
         spawn(server, Vec3.atBottomCenterOf(at), State.ball(size), 0);
         if (player == null || !player.hasInfiniteMaterials()) {
             held.shrink(1);
         }
-        sound(server, Vec3.atCenterOf(at), SoundEvents.SNOW_PLACE, 1.0f);
+        sound(server, Vec3.atCenterOf(at), "ball.place", 1.0f);
         return InteractionResult.SUCCESS;
     }
 
@@ -177,7 +200,7 @@ public final class Snowman {
             return InteractionResult.FAIL;
         }
         spawn(server, Vec3.atBottomCenterOf(at), State.ball(Ball.MIN_SIZE), 0);
-        sound(server, Vec3.atCenterOf(at), SoundEvents.SNOW_PLACE, 1.2f);
+        sound(server, Vec3.atCenterOf(at), "ball.pack", 1.0f);
         return InteractionResult.SUCCESS;
     }
 
@@ -207,7 +230,7 @@ public final class Snowman {
             if (s.sizes.length == 1) {
                 give(player, ballItem(s.top()));
                 discard(root);
-                sound(server, root.position(), SoundEvents.SNOW_BREAK, 1.3f);
+                sound(server, root.position(), "ball.pickup", 1.0f);
                 return InteractionResult.SUCCESS;
             }
             return InteractionResult.PASS;
@@ -239,7 +262,7 @@ public final class Snowman {
         } else {
             LAST_HIT.put(root, now);
             wobble(root, s);
-            sound(server, root.position().add(0, 0.5, 0), SoundEvents.SNOW_HIT, 1.0f);
+            sound(server, root.position().add(0, 0.5, 0), "snowman.hit", 1.0f);
         }
         return true;
     }
@@ -258,7 +281,7 @@ public final class Snowman {
             if (canOccupy(level, to.below()) && level.getBlockState(to).canBeReplaced()) {
                 to = to.below();
             } else {
-                sound(level, root.position(), SoundEvents.SNOW_HIT, 0.8f);
+                sound(level, root.position(), "deny", 1.0f);
                 return;
             }
         } else if (canOccupy(level, to.below()) && level.getBlockState(to.below()).canBeReplaced()
@@ -266,7 +289,7 @@ public final class Snowman {
             to = to.below();
         }
         if (rootAt(level, to, root) != null) {
-            sound(level, root.position(), SoundEvents.SNOW_HIT, 0.8f);
+            sound(level, root.position(), "deny", 1.0f);
             return;
         }
         int size = s.top();
@@ -285,9 +308,13 @@ public final class Snowman {
         Vector3f axis = new Vector3f(dir.getStepZ(), 0, -dir.getStepX());
         Quaternionf spin = SPIN.computeIfAbsent(root, r -> new Quaternionf());
         new Quaternionf().rotateAxis(1.0f / (Ball.scale(size) / 2), axis).mul(spin, spin);
+        boolean grew = size != s.sizes[0];
         s.sizes[0] = size;
         writeState(root, s);
         Vec3 target = Vec3.atBottomCenterOf(to);
+        if (grew) {
+            sound(level, target, "ball.grow", Math.max(0.5f, 1.4f - size * 0.02f));
+        }
         root.snapTo(target);
         resize(root, s);
         for (Display part : parts(root)) {
@@ -297,7 +324,7 @@ public final class Snowman {
         BUSY.put(root, now + ROLL_TICKS - 1);
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SNOW_BLOCK.defaultBlockState()),
                 target.x, target.y + 0.1, target.z, 6, 0.25, 0.05, 0.25, 0.05);
-        sound(level, target, SoundEvents.SNOW_STEP, 0.9f + level.getRandom().nextFloat() * 0.2f);
+        sound(level, target, "ball.roll", 0.9f + level.getRandom().nextFloat() * 0.2f);
     }
 
     /** Free space with something solid (or deep snow) to rest on. */
@@ -319,7 +346,7 @@ public final class Snowman {
     private static InteractionResult stack(ServerLevel level, Interaction root, State s, ItemStack item, int size,
             Player player) {
         if (s.decorated() || !Ball.canStack(s.sizes, size)) {
-            sound(level, root.position(), SoundEvents.SNOW_STEP, 0.6f);
+            sound(level, root.position(), "deny", 1.0f);
             return InteractionResult.FAIL;
         }
         int[] sizes = new int[s.sizes.length + 1];
@@ -337,10 +364,12 @@ public final class Snowman {
         writeState(root, s);
         rebuild(level, root);
         Vec3 top = root.position().add(0, Ball.height(s.sizes), 0);
-        sound(level, top, SoundEvents.SNOW_PLACE, 0.9f);
+        sound(level, top, "ball.stack", 1.0f);
         if (s.complete()) {
             level.sendParticles(ParticleTypes.SNOWFLAKE, top.x, top.y, top.z, 24, 0.4, 0.4, 0.4, 0.02);
-            sound(level, top, SoundEvents.AMETHYST_BLOCK_CHIME, 1.2f);
+            sound(level, top, "snowman.complete", 1.0f);
+            sound(level, top, "snowman.complete", 1.5f);
+            sound(level, top, "snowman.sparkle", 1.0f);
         }
         return InteractionResult.SUCCESS;
     }
@@ -371,7 +400,7 @@ public final class Snowman {
             if (s.sizes.length == 1) {
                 give(player, back);
                 discard(root);
-                sound(level, root.position(), SoundEvents.SNOW_BREAK, 1.3f);
+                sound(level, root.position(), "ball.pickup", 1.0f);
                 return InteractionResult.SUCCESS;
             }
             int[] sizes = new int[s.sizes.length - 1];
@@ -381,14 +410,14 @@ public final class Snowman {
         writeState(root, s);
         rebuild(level, root);
         give(player, back);
-        sound(level, root.position().add(0, Ball.height(s.sizes), 0), SoundEvents.ITEM_PICKUP, 1.0f);
+        sound(level, root.position().add(0, Ball.height(s.sizes), 0), "snowman.decorate", 0.8f);
         return InteractionResult.SUCCESS;
     }
 
     private static InteractionResult decorate(ServerLevel level, Interaction root, State s, Player player,
             ItemStack item) {
         ItemStack back = ItemStack.EMPTY;
-        SoundEvent sound = SoundEvents.SNOW_PLACE;
+        String sound = "snowman.decorate";
         if (item.is(Items.COAL) || item.is(Items.CHARCOAL)) {
             if (!s.eyes) {
                 s.eyes = true;
@@ -401,13 +430,13 @@ public final class Snowman {
             s.nose = true;
         } else if (item.is(Items.STICK) && s.arms < 2) {
             s.arms++;
-            sound = SoundEvents.WOOD_PLACE;
+            sound = "snowman.decorate";
         } else if (item.getItem() instanceof BlockItem block && block.getBlock() instanceof WoolCarpetBlock carpet) {
             if (s.scarf != null) {
                 back = new ItemStack(carpet(s.scarf));
             }
             s.scarf = carpet.getColor().getSerializedName();
-            sound = SoundEvents.WOOL_PLACE;
+            sound = "snowman.scarf";
         } else if (item.is(Items.COAL) || item.is(Items.CHARCOAL) || item.is(Items.CARROT) || item.is(Items.STICK)
                 || item.is(Items.SNOWBALL)) {
             return InteractionResult.PASS;
@@ -417,7 +446,7 @@ public final class Snowman {
             }
             s.hat = true;
             NEW_HAT.put(root, item.copyWithCount(1));
-            sound = SoundEvents.ARMOR_EQUIP_GENERIC.value();
+            sound = "snowman.hat";
         }
         if (!player.hasInfiniteMaterials()) {
             item.shrink(1);
@@ -494,7 +523,7 @@ public final class Snowman {
         }
         best.setYRot(best.getYRot() + (back ? -ROTATE_STEP : ROTATE_STEP));
         layout(best, State.read(best.entityTags()), 6, 0);
-        sound(level, best.position().add(0, 1, 0), SoundEvents.SNOW_STEP, 1.2f);
+        sound(level, best.position().add(0, 1, 0), "snowman.rotate", 1.0f);
     }
 
     private static boolean isTopHat(ItemStack stack) {
@@ -540,6 +569,7 @@ public final class Snowman {
         layout(root, s, 20, 0);
         level.sendParticles(ParticleTypes.FALLING_WATER, root.getX(), root.getY() + Ball.height(s.sizes) * 0.5,
                 root.getZ(), 6, 0.3, 0.3, 0.3, 0);
+        sound(level, root.position().add(0, Ball.height(s.sizes) * 0.5, 0), "snowman.melt", 1.0f);
     }
 
     // ---------------------------------------------------------------- building the looks
@@ -699,6 +729,7 @@ public final class Snowman {
             for (int size : s.sizes) {
                 snow += size;
             }
+            snow = Math.min(snow, MAX_SNOW_DROPS);
             while (snow > 0) {
                 int n = Math.min(16, snow);
                 drops.add(new ItemStack(Items.SNOWBALL, n));
@@ -731,7 +762,7 @@ public final class Snowman {
         }
         level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SNOW_BLOCK.defaultBlockState()),
                 root.getX(), root.getY() + h * 0.5, root.getZ(), 40, 0.35, h * 0.3, 0.35, 0.1);
-        sound(level, root.position().add(0, h * 0.5, 0), SoundEvents.SNOW_BREAK, 0.9f);
+        sound(level, root.position().add(0, h * 0.5, 0), "snowman.break", 1.0f);
         discard(root);
     }
 
@@ -762,8 +793,10 @@ public final class Snowman {
         }
     }
 
-    private static void sound(ServerLevel level, Vec3 at, SoundEvent sound, float pitch) {
-        level.playSound(null, at.x, at.y, at.z, sound, SoundSource.BLOCKS, 1.0f, pitch);
+    /** Plays one of the mod's sounds (see assets/snowmen/sounds.json); they reuse vanilla sound files. */
+    private static void sound(ServerLevel level, Vec3 at, String name, float pitch) {
+        SoundEvent event = SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(SnowmenMod.ID, name));
+        level.playSound(null, at.x, at.y, at.z, Holder.direct(event), SoundSource.BLOCKS, 1.0f, pitch);
     }
 
     private static DyeColor dye(String name) {

@@ -5,5 +5,21 @@
   "item.snowmen.top_hat": "Haut-de-forme",
   "item.snowmen.top_hat.hint": "Un bonhomme de neige qui le porte ne fond jamais",
   "key.snowmen.rotate": "Tourner le bonhomme de neige",
-  "snowmen.hint.rotate": "Appuie sur %s pour tourner le bonhomme de neige"
+  "snowmen.hint.rotate": "Appuie sur %s pour tourner le bonhomme de neige",
+  "subtitles.snowmen.ball.pack": "Boule de neige formée",
+  "subtitles.snowmen.ball.roll": "Boule de neige qui roule",
+  "subtitles.snowmen.ball.grow": "Boule de neige qui grossit",
+  "subtitles.snowmen.ball.pickup": "Boule de neige ramassée",
+  "subtitles.snowmen.ball.place": "Boule de neige posée",
+  "subtitles.snowmen.ball.stack": "Boule de neige empilée",
+  "subtitles.snowmen.snowman.complete": "Bonhomme de neige terminé",
+  "subtitles.snowmen.snowman.sparkle": "La neige scintille",
+  "subtitles.snowmen.snowman.decorate": "Bonhomme de neige décoré",
+  "subtitles.snowmen.snowman.scarf": "Écharpe nouée",
+  "subtitles.snowmen.snowman.hat": "Chapeau mis",
+  "subtitles.snowmen.snowman.rotate": "Bonhomme de neige qui tourne",
+  "subtitles.snowmen.snowman.hit": "Bonhomme de neige qui vacille",
+  "subtitles.snowmen.snowman.break": "Bonhomme de neige qui s'effondre",
+  "subtitles.snowmen.snowman.melt": "Bonhomme de neige qui fond",
+  "subtitles.snowmen.deny": "La neige crisse"
 }

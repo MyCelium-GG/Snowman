@@ -5,7 +5,7 @@
 ## How it works
 
 1. **Pack a snowball:** right-click snow with an empty hand
-2. **Roll it:** hit it, and it rolls through the snow, growing as it goes and leaving a trail of grass behind
+2. **Roll it:** hit it, and it rolls through the snow, growing as it goes and leaving a trail of grass behind. There's no size limit, so go build a giant
 3. **Stack it:** right-click a snowball to pick it up, then right-click a bigger one to put it on top
 4. **Decorate it:** right-click your finished snowman with
    - **coal** for eyes and buttons
@@ -15,11 +15,12 @@
    - a **Top Hat** you can craft, and your snowman never melts
    - **anything else** for a hat: a bucket, a pumpkin, a flower, a helmet
 
-Every snowman turns out different, because you decide how big each snowball gets.
+Every snowman turns out different, because you decide how big each snowball gets. Picked-up snowballs keep their size, and you can see it in your inventory.
 
 ## Good to know
 
 - Press **R** next to your snowman to turn it
+- Snowy sounds for every step
 - Sneak and right-click to take decorations off again
 - Hit a snowman twice to knock it over and get everything back
 - Snowmen slowly melt in deserts and the Nether, unless they wear a Top Hat

@@ -4,6 +4,9 @@
 
 ### Added
 - Pack a snowball from snow, roll it to make it grow, pick it up as a Rolled Snowball and stack three into a snowman.
+- Snowballs grow without a size limit; the item shows its size, in the inventory and in your hand.
+- Icy item names, and every snowball size in the creative menu and search.
+- Snowy sounds with subtitles for packing, rolling, growing, stacking, decorating, turning, melting and breaking.
 - A craftable Top Hat that keeps a snowman from melting.
 - Turn a finished snowman with R; a hint appears when you stand next to one.
 - Decorations from vanilla items: coal eyes and buttons, a carrot nose, stick arms, a carpet scarf and any item as a hat.

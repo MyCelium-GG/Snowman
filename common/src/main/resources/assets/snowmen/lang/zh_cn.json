@@ -5,5 +5,21 @@
   "item.snowmen.top_hat": "高礼帽",
   "item.snowmen.top_hat.hint": "戴上它的雪人永远不会融化",
   "key.snowmen.rotate": "转动雪人",
-  "snowmen.hint.rotate": "按 %s 转动雪人"
+  "snowmen.hint.rotate": "按 %s 转动雪人",
+  "subtitles.snowmen.ball.pack": "雪球捏好",
+  "subtitles.snowmen.ball.roll": "雪球滚动",
+  "subtitles.snowmen.ball.grow": "雪球变大",
+  "subtitles.snowmen.ball.pickup": "捡起雪球",
+  "subtitles.snowmen.ball.place": "放下雪球",
+  "subtitles.snowmen.ball.stack": "叠起雪球",
+  "subtitles.snowmen.snowman.complete": "雪人完成",
+  "subtitles.snowmen.snowman.sparkle": "雪花闪烁",
+  "subtitles.snowmen.snowman.decorate": "装饰雪人",
+  "subtitles.snowmen.snowman.scarf": "系上围巾",
+  "subtitles.snowmen.snowman.hat": "戴上帽子",
+  "subtitles.snowmen.snowman.rotate": "雪人转动",
+  "subtitles.snowmen.snowman.hit": "雪人摇晃",
+  "subtitles.snowmen.snowman.break": "雪人散架",
+  "subtitles.snowmen.snowman.melt": "雪人融化",
+  "subtitles.snowmen.deny": "雪嘎吱作响"
 }

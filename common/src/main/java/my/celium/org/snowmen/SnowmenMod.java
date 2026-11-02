@@ -62,8 +62,8 @@ public final class SnowmenMod {
         ConfigBuilder builder = Mycel.config(META);
         melting = builder.booleanValue("melting", true,
                 "Snowmen and snowballs slowly melt in places where a snow golem would melt, like deserts and the Nether.");
-        maxBallSize = builder.intValue("maxBallSize", Ball.MAX_SIZE, Ball.MIN_SIZE + 1, Ball.MAX_SIZE,
-                "How big a snowball can grow while rolling.");
+        maxBallSize = builder.intValue("maxBallSize", 0, 0, 1_000_000,
+                "How big a snowball can grow while rolling. 0 means no limit.");
         snowTrail = builder.booleanValue("snowTrail", true,
                 "Rolling a snowball picks up the snow it rolls over and leaves a trail of bare ground.");
         rotateHint = builder.booleanValue("rotateHint", true,
@@ -76,6 +76,7 @@ public final class SnowmenMod {
     }
 
     public static int maxBallSize() {
-        return maxBallSize == null ? Ball.MAX_SIZE : maxBallSize.get();
+        int max = maxBallSize == null ? 0 : maxBallSize.get();
+        return max <= 0 ? Integer.MAX_VALUE : max;
     }
 }

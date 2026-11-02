@@ -5,5 +5,21 @@
   "item.snowmen.top_hat": "Sombrero de copa",
   "item.snowmen.top_hat.hint": "Un muñeco de nieve con él nunca se derrite",
   "key.snowmen.rotate": "Girar muñeco de nieve",
-  "snowmen.hint.rotate": "Pulsa %s para girar el muñeco de nieve"
+  "snowmen.hint.rotate": "Pulsa %s para girar el muñeco de nieve",
+  "subtitles.snowmen.ball.pack": "Bola de nieve formada",
+  "subtitles.snowmen.ball.roll": "Bola de nieve rueda",
+  "subtitles.snowmen.ball.grow": "Bola de nieve crece",
+  "subtitles.snowmen.ball.pickup": "Bola de nieve recogida",
+  "subtitles.snowmen.ball.place": "Bola de nieve colocada",
+  "subtitles.snowmen.ball.stack": "Bola de nieve apilada",
+  "subtitles.snowmen.snowman.complete": "Muñeco de nieve terminado",
+  "subtitles.snowmen.snowman.sparkle": "La nieve brilla",
+  "subtitles.snowmen.snowman.decorate": "Muñeco de nieve decorado",
+  "subtitles.snowmen.snowman.scarf": "Bufanda atada",
+  "subtitles.snowmen.snowman.hat": "Sombrero puesto",
+  "subtitles.snowmen.snowman.rotate": "Muñeco de nieve gira",
+  "subtitles.snowmen.snowman.hit": "Muñeco de nieve se tambalea",
+  "subtitles.snowmen.snowman.break": "Muñeco de nieve se deshace",
+  "subtitles.snowmen.snowman.melt": "Muñeco de nieve se derrite",
+  "subtitles.snowmen.deny": "Cruje la nieve"
 }

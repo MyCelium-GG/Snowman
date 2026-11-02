@@ -5,5 +5,21 @@
   "item.snowmen.top_hat": "Top Hat",
   "item.snowmen.top_hat.hint": "A snowman wearing it never melts",
   "key.snowmen.rotate": "Rotate snowman",
-  "snowmen.hint.rotate": "Press %s to turn the snowman"
+  "snowmen.hint.rotate": "Press %s to turn the snowman",
+  "subtitles.snowmen.ball.pack": "Snowball packed",
+  "subtitles.snowmen.ball.roll": "Snowball rolls",
+  "subtitles.snowmen.ball.grow": "Snowball grows",
+  "subtitles.snowmen.ball.pickup": "Snowball picked up",
+  "subtitles.snowmen.ball.place": "Snowball placed",
+  "subtitles.snowmen.ball.stack": "Snowball stacked",
+  "subtitles.snowmen.snowman.complete": "Snowman finished",
+  "subtitles.snowmen.snowman.sparkle": "Snow sparkles",
+  "subtitles.snowmen.snowman.decorate": "Snowman decorated",
+  "subtitles.snowmen.snowman.scarf": "Scarf tied",
+  "subtitles.snowmen.snowman.hat": "Hat put on",
+  "subtitles.snowmen.snowman.rotate": "Snowman turns",
+  "subtitles.snowmen.snowman.hit": "Snowman wobbles",
+  "subtitles.snowmen.snowman.break": "Snowman falls apart",
+  "subtitles.snowmen.snowman.melt": "Snowman melts",
+  "subtitles.snowmen.deny": "Snow crunches"
 }

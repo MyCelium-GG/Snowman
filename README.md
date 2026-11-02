@@ -3,8 +3,8 @@
 Build your own snowman. Roll a snowball through the snow until it is big enough, stack three, and decorate it.
 
 - **Pack a snowball:** right-click snow with an empty hand.
-- **Roll it:** hit it. It rolls one block the way you face, picks up the snow it rolls over and grows. Rolling leaves a trail of bare ground.
-- **Pick it up:** right-click a snowball with an empty hand. It becomes a Rolled Snowball item that keeps its size. Right-click the ground to put it down again.
+- **Roll it:** hit it. It rolls one block the way you face, picks up the snow it rolls over and grows, with no size limit. Rolling leaves a trail of bare ground.
+- **Pick it up:** right-click a snowball with an empty hand. It becomes a Rolled Snowball item that keeps its size and looks bigger the bigger it is, in the inventory and in your hand. Right-click the ground to put it down again. In creative, every size up to 16 (and a few bigger ones) is in Tools & Utilities and in the search.
 - **Stack it:** right-click a bigger snowball while holding a smaller Rolled Snowball. Three make a snowman, and it turns to face you.
 - **Turn it:** stand next to a finished snowman and press **R** (sneak + R turns the other way). The key can be changed in Controls.
 - **Decorate it:** right-click the snowman with
@@ -26,14 +26,14 @@ Build your own snowman. Roll a snowball through the snow until it is big enough,
 BBB
 ```
 
-Snowmen are made of vanilla display entities. The mod adds two items, the Rolled Snowball and the Top Hat, so it is needed on both the server and the client. Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3.
+Every action has its own snowy sound (with subtitles), built from vanilla sound files. Snowmen are made of vanilla display entities. The mod adds two items, the Rolled Snowball and the Top Hat, so it is needed on both the server and the client. Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3.
 
 ## Settings
 
 | Setting | Default | What it does |
 |---|---|---|
 | Melting | On | Snowmen slowly shrink and finally fall apart where a snow golem would melt |
-| Max ball size | 16 | How big a snowball can grow while rolling |
+| Max ball size | 0 (no limit) | How big a snowball can grow while rolling |
 | Snow trail | On | Rolling picks up the snow and leaves bare ground behind |
 | Rotate hint | On | Shows "Press R to turn the snowman" above the hotbar next to a finished snowman |
 
