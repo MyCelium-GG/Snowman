@@ -13,10 +13,11 @@ class LayoutTest {
     }
 
     @Test
-    void aLoneBallIsThreeRoundingBoxes() {
+    void aLoneBallIsThreeRoundingBoxesAndAnInnerShell() {
         List<Layout.Piece> pieces = Layout.pieces(State.ball(5), 0, 0, null);
-        assertEquals(3, pieces.size());
-        assertEquals(3, count(pieces, Layout.Kind.BALL));
+        assertEquals(4, pieces.size());
+        assertEquals(4, count(pieces, Layout.Kind.BALL));
+        assertTrue(pieces.get(3).matrix().determinant() < 0, "the inner shell is mirrored so it faces inward");
     }
 
     @Test
@@ -30,7 +31,7 @@ class LayoutTest {
         s.scarf = "red";
         s.hat = true;
         List<Layout.Piece> pieces = Layout.pieces(s, 0, 0, null);
-        assertEquals(9, count(pieces, Layout.Kind.BALL));
+        assertEquals(12, count(pieces, Layout.Kind.BALL));
         assertEquals(2, count(pieces, Layout.Kind.EYE));
         assertEquals(1, count(pieces, Layout.Kind.NOSE));
         assertEquals(3, count(pieces, Layout.Kind.BUTTON));

@@ -14,9 +14,9 @@ public final class Ice {
     private Ice() {
     }
 
-    /** {@code text} with a snow-to-ice gradient across its letters and a snowflake in front. */
+    /** {@code text} with a snow-to-ice gradient across its letters. */
     public static MutableComponent gradient(String text) {
-        MutableComponent out = Component.literal("❄ ").withStyle(s -> s.withColor(FROST).withItalic(false));
+        MutableComponent out = Component.empty();
         int[] codePoints = text.codePoints().toArray();
         for (int i = 0; i < codePoints.length; i++) {
             // 0 at the ends, 1 in the middle: white edges, blue core.

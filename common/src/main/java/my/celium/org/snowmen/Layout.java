@@ -38,14 +38,23 @@ public final class Layout {
         for (int i = 0; i < sizes.length; i++) {
             float w = Ball.scale(sizes[i]);
             float y = Ball.centre(sizes, i);
-            // Three crossed boxes make the ball look round instead of like a cube.
+            // Three crossed boxes make the ball look round instead of like a cube; a fourth fills the inside.
             float[][] dims = {{w, w * ROUND, w * ROUND}, {w * ROUND, w, w * ROUND}, {w * ROUND, w * ROUND, w}};
-            for (int k = 0; k < 3; k++) {
+            for (int k = 0; k < 4; k++) {
                 Matrix4f m = new Matrix4f(frame).translate(0, y, 0);
                 if (roll != null && sizes.length == 1) {
                     m.rotate(roll);
                 }
-                out.add(new Piece(Kind.BALL, i * 3 + k, cube(m, dims[k][0], dims[k][1], dims[k][2]), true));
+                Matrix4f box;
+                if (k < 3) {
+                    box = cube(m, dims[k][0], dims[k][1], dims[k][2]);
+                } else {
+                    // A mirrored shell: the negative scale turns its faces inward, so a player
+                    // standing inside a big snowball sees white snow instead of looking through it.
+                    float inner = w * ROUND * 0.99f;
+                    box = cube(m, -inner, inner, inner);
+                }
+                out.add(new Piece(Kind.BALL, i * 4 + k, box, true));
             }
         }
         if (sizes.length < 2) {
