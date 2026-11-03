@@ -1,0 +1,45 @@
+{
+  "model": {
+    "type": "minecraft:range_dispatch",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "snowmen:item/scarf",
+      "tints": [
+        {
+          "type": "minecraft:dye",
+          "default": -5231066
+        }
+      ]
+    },
+    "entries": [
+      {
+        "threshold": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/scarf_band",
+          "tints": [
+            {
+              "type": "minecraft:dye",
+              "default": -5231066
+            }
+          ]
+        }
+      },
+      {
+        "threshold": 2,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/scarf_tail",
+          "tints": [
+            {
+              "type": "minecraft:dye",
+              "default": -5231066
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

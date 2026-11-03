@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_dye",
+  "dye": "#minecraft:dyes",
+  "group": "dyed_scarf",
+  "result": {
+    "id": "snowmen:scarf"
+  },
+  "target": "snowmen:scarf"
+}

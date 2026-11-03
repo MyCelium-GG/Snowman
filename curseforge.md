@@ -11,7 +11,7 @@
    - **coal** for eyes and buttons
    - a **carrot** for the nose
    - **sticks** for arms
-   - any **carpet** for a scarf in that colour
+   - a knitted **Scarf**, in any colour you dye it
    - a **Top Hat** you can craft, and your snowman never melts
    - **anything else** for a hat: a bucket, a pumpkin, a flower, a helmet
 
@@ -25,5 +25,6 @@ Every snowman turns out different, because you decide how big each snowball gets
 - Hit a snowman twice to knock it over and get everything back
 - Snowmen slowly melt in deserts and the Nether, unless they wear a Top Hat
 - Top Hat recipe: black wool on top, red dye in the middle, three black wool at the bottom
+- Scarf recipe: three wool in a row, one more under the right end; dye it like leather armor
 - Settings: turn melting or the snow trail off, or change how big snowballs can grow
 - Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel)

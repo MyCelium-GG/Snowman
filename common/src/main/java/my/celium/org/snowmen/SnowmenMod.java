@@ -38,6 +38,7 @@ public final class SnowmenMod {
     public static ConfigValue<Boolean> rotateHint;
     public static DeferredEntry<Item> rolledSnowball;
     public static DeferredEntry<Item> topHat;
+    public static DeferredEntry<Item> scarf;
     public static PacketDefinition<RotatePacket> rotate;
 
     private SnowmenMod() {
@@ -54,6 +55,12 @@ public final class SnowmenMod {
                 key -> new TopHatItem(new Item.Properties().setId(key).stacksTo(16)
                         .component(DataComponents.LORE, new ItemLore(List.of(
                                 Component.translatable("item.snowmen.top_hat.hint")
+                                        .withStyle(st -> st.withItalic(false)).withStyle(ChatFormatting.GRAY))))));
+
+        scarf = MycelRegistry.items(META).registerWithKey("scarf",
+                key -> new ScarfItem(new Item.Properties().setId(key).stacksTo(16)
+                        .component(DataComponents.LORE, new ItemLore(List.of(
+                                Component.translatable("item.snowmen.scarf.hint")
                                         .withStyle(st -> st.withItalic(false)).withStyle(ChatFormatting.GRAY))))));
 
         rotate = PacketDefinition.toServer(RotatePacket.TYPE, RotatePacket.CODEC,

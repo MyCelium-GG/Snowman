@@ -21,5 +21,7 @@
   "subtitles.snowmen.snowman.hit": "Снеговик качается",
   "subtitles.snowmen.snowman.break": "Снеговик разваливается",
   "subtitles.snowmen.snowman.melt": "Снеговик тает",
-  "subtitles.snowmen.deny": "Снег хрустит"
+  "subtitles.snowmen.deny": "Снег хрустит",
+  "item.snowmen.scarf": "Шарф",
+  "item.snowmen.scarf.hint": "Повяжите его снеговику. Можно покрасить."
 }

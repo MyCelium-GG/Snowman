@@ -21,5 +21,7 @@
   "subtitles.snowmen.snowman.hit": "Bonhomme de neige qui vacille",
   "subtitles.snowmen.snowman.break": "Bonhomme de neige qui s'effondre",
   "subtitles.snowmen.snowman.melt": "Bonhomme de neige qui fond",
-  "subtitles.snowmen.deny": "La neige crisse"
+  "subtitles.snowmen.deny": "La neige crisse",
+  "item.snowmen.scarf": "Écharpe",
+  "item.snowmen.scarf.hint": "Mets-la à un bonhomme de neige. Peut être teinte."
 }

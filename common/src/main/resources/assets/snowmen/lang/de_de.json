@@ -21,5 +21,7 @@
   "subtitles.snowmen.snowman.hit": "Schneemann wackelt",
   "subtitles.snowmen.snowman.break": "Schneemann zerfällt",
   "subtitles.snowmen.snowman.melt": "Schneemann schmilzt",
-  "subtitles.snowmen.deny": "Schnee knirscht"
+  "subtitles.snowmen.deny": "Schnee knirscht",
+  "item.snowmen.scarf": "Schal",
+  "item.snowmen.scarf.hint": "Bind ihn einem Schneemann um. Färbbar."
 }

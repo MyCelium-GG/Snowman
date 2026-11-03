@@ -108,23 +108,24 @@ public final class Layout {
                     cube(new Matrix4f(frame).translate(0, ny, frontZ(headR, 0) + len * 0.38f), t, t, len), true));
         }
         if (s.scarf != null) {
-            float t = Math.max(0.08f, headW * 0.17f);
-            float neckY = headY - headR * 0.82f;
-            float outer = headW * 0.98f + 0.04f;
-            float inner = headW * ROUND + 0.04f;
-            out.add(new Piece(Kind.SCARF, 0, cube(new Matrix4f(frame).translate(0, neckY, 0), outer, t, inner), true));
-            out.add(new Piece(Kind.SCARF, 1, cube(new Matrix4f(frame).translate(0, neckY, 0), inner, t, outer), true));
-            float tail = Math.max(0.2f, headW * 0.55f);
-            out.add(new Piece(Kind.SCARF, 2, cube(new Matrix4f(frame)
-                    .translate(headW * 0.24f, neckY - tail * 0.45f, outer / 2 + 0.01f), t * 0.9f, tail, 0.05f), true));
+            // The band goes around the neck, wide enough to sit outside the snow (the band is 14/16 wide).
+            float neckY = headY - headR * 0.85f;
+            out.add(new Piece(Kind.SCARF, 0,
+                    new Matrix4f(frame).translate(0, neckY, 0).scale(headW * 1.32f), false));
+            // The loose end hangs down the front of the body, whatever the body's size.
+            float len = Math.max(0.3f, headW * 0.7f);
+            float tailY = neckY - len * 0.45f;
+            out.add(new Piece(Kind.SCARF, 1, new Matrix4f(frame)
+                    .translate(headW * 0.2f, tailY, frontZ(midR, tailY - midY) + len * 0.06f)
+                    .rotateZ((float) Math.toRadians(4)).scale(len), false));
         }
         if (s.hat) {
             Matrix4f m;
             if (s.hatTop) {
                 // The top hat's model is a full block: brim at the bottom, centred on the origin.
+                // Flat and sunk a little into the head, so no snow shows between brim and head.
                 float size = headW * 1.15f;
-                m = new Matrix4f(frame).translate(0, headY + headR * 0.92f + size * 0.5f, 0)
-                        .rotateZ((float) Math.toRadians(-6)).scale(size);
+                m = new Matrix4f(frame).translate(0, headY + headR * 0.86f + size * 0.5f, 0).scale(size);
             } else if (s.hatBlock) {
                 // Blocks use the "worn on the head" model, which sits over the head like a pumpkin.
                 m = new Matrix4f(frame).translate(0, headY + headR * 0.95f, 0).scale(headW * 1.25f);

@@ -21,5 +21,7 @@
   "subtitles.snowmen.snowman.hit": "雪人摇晃",
   "subtitles.snowmen.snowman.break": "雪人散架",
   "subtitles.snowmen.snowman.melt": "雪人融化",
-  "subtitles.snowmen.deny": "雪嘎吱作响"
+  "subtitles.snowmen.deny": "雪嘎吱作响",
+  "item.snowmen.scarf": "围巾",
+  "item.snowmen.scarf.hint": "给雪人围上。可以染色。"
 }

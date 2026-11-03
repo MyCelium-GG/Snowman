@@ -11,12 +11,19 @@ Build your own snowman. Roll a snowball through the snow until it is big enough,
   - coal or charcoal: eyes first, then up to three buttons
   - a carrot: the nose
   - sticks: up to two arms
-  - any carpet: a scarf in that colour
+  - a **Scarf**: a knitted scarf with a hanging end. Craft it from wool and dye it any colour, like leather armor.
   - a **Top Hat**: crafted from black wool and red dye. A snowman wearing one never melts.
   - anything else: a hat. Blocks like a carved pumpkin go over the head, items like a bucket sit on top.
 - **Take things off:** sneak and right-click with an empty hand. Decorations come off one at a time, then the top snowball.
 - **Knock it over:** hit a snowman twice quickly. You get the snow and every decoration back.
 - **Melting:** snowmen slowly melt where a snow golem would, like deserts and the Nether, unless they wear a Top Hat.
+
+### Scarf recipe
+
+```
+WWW      W = any wool
+  W      Dye it by crafting it with any dye.
+```
 
 ### Top Hat recipe
 

@@ -21,5 +21,7 @@
   "subtitles.snowmen.snowman.hit": "Boneco de neve balança",
   "subtitles.snowmen.snowman.break": "Boneco de neve desmorona",
   "subtitles.snowmen.snowman.melt": "Boneco de neve derrete",
-  "subtitles.snowmen.deny": "A neve range"
+  "subtitles.snowmen.deny": "A neve range",
+  "item.snowmen.scarf": "Cachecol",
+  "item.snowmen.scarf.hint": "Coloque num boneco de neve. Pode ser tingido."
 }

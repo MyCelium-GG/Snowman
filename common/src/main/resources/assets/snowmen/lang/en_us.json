@@ -21,5 +21,7 @@
   "subtitles.snowmen.snowman.hit": "Snowman wobbles",
   "subtitles.snowmen.snowman.break": "Snowman falls apart",
   "subtitles.snowmen.snowman.melt": "Snowman melts",
-  "subtitles.snowmen.deny": "Snow crunches"
+  "subtitles.snowmen.deny": "Snow crunches",
+  "item.snowmen.scarf": "Scarf",
+  "item.snowmen.scarf.hint": "Put it on a snowman. Dye it any colour."
 }

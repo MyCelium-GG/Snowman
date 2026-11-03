@@ -36,7 +36,7 @@ class LayoutTest {
         assertEquals(1, count(pieces, Layout.Kind.NOSE));
         assertEquals(3, count(pieces, Layout.Kind.BUTTON));
         assertEquals(2, count(pieces, Layout.Kind.ARM));
-        assertEquals(3, count(pieces, Layout.Kind.SCARF));
+        assertEquals(2, count(pieces, Layout.Kind.SCARF));
         assertEquals(1, count(pieces, Layout.Kind.HAT));
     }
 

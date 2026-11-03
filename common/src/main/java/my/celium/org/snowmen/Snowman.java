@@ -38,12 +38,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SnowLayerBlock;
-import net.minecraft.world.level.block.WoolCarpetBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -123,6 +123,9 @@ public final class Snowman {
             return out;
         }
         out.add(new ItemStack(SnowmenMod.topHat.get()));
+        if (SnowmenMod.scarf != null) {
+            out.add(new ItemStack(SnowmenMod.scarf.get()));
+        }
         for (int size = Ball.MIN_SIZE; size <= Ball.MAX_SIZE; size++) {
             out.add(ballItem(size));
         }
@@ -580,7 +583,7 @@ public final class Snowman {
             back = hatOf(root);
             s.hat = false;
         } else if (s.scarf != null) {
-            back = new ItemStack(carpet(s.scarf));
+            back = scarfItem(scarfColor(s.scarf));
             s.scarf = null;
         } else if (s.arms > 0) {
             s.arms--;
@@ -630,14 +633,14 @@ public final class Snowman {
         } else if (item.is(Items.STICK) && s.arms < 2) {
             s.arms++;
             sound = "snowman.decorate";
-        } else if (item.getItem() instanceof BlockItem block && block.getBlock() instanceof WoolCarpetBlock carpet) {
+        } else if (isScarf(item)) {
             if (s.scarf != null) {
-                back = new ItemStack(carpet(s.scarf));
+                back = scarfItem(scarfColor(s.scarf));
             }
-            s.scarf = carpet.getColor().getSerializedName();
+            s.scarf = String.format("%06x", DyedItemColor.getOrDefault(item, ScarfItem.DEFAULT_COLOR) & 0xFFFFFF);
             sound = "snowman.scarf";
         } else if (item.is(Items.COAL) || item.is(Items.CHARCOAL) || item.is(Items.CARROT) || item.is(Items.STICK)
-                || item.is(Items.SNOWBALL)) {
+                || item.is(Items.SNOWBALL) || isScarf(item)) {
             return InteractionResult.PASS;
         } else {
             if (s.hat) {
@@ -847,7 +850,11 @@ public final class Snowman {
                 display = block;
             } else {
                 Display.ItemDisplay item = new Display.ItemDisplay(Compat.itemDisplay(), level);
-                ItemStack stack = piece.kind() == Layout.Kind.HAT ? hat : new ItemStack(Items.STICK);
+                ItemStack stack = switch (piece.kind()) {
+                    case HAT -> hat;
+                    case SCARF -> scarfPart(scarfColor(s.scarf), piece.index());
+                    default -> new ItemStack(Items.STICK);
+                };
                 ((ItemDisplayAccessor) item).snowmen$setItemStack(stack);
                 ((ItemDisplayAccessor) item).snowmen$setItemTransform(
                         piece.kind() == Layout.Kind.HAT && s.hatBlock ? ItemDisplayContext.HEAD : ItemDisplayContext.NONE);
@@ -910,7 +917,6 @@ public final class Snowman {
         return switch (kind) {
             case EYE, BUTTON -> Blocks.COAL_BLOCK.defaultBlockState();
             case NOSE -> Compat.orangeConcrete().defaultBlockState();
-            case SCARF -> Compat.wool(dye(s.scarf)).defaultBlockState();
             default -> Blocks.SNOW_BLOCK.defaultBlockState();
         };
     }
@@ -953,7 +959,7 @@ public final class Snowman {
             drops.add(new ItemStack(Items.STICK, s.arms));
         }
         if (s.scarf != null) {
-            drops.add(new ItemStack(carpet(s.scarf)));
+            drops.add(scarfItem(scarfColor(s.scarf)));
         }
         if (s.hat) {
             drops.add(hatOf(root));
@@ -1003,16 +1009,41 @@ public final class Snowman {
         level.playSound(null, at.x, at.y, at.z, Holder.direct(event), SoundSource.BLOCKS, 1.0f, pitch);
     }
 
-    private static DyeColor dye(String name) {
-        for (DyeColor color : DyeColor.values()) {
-            if (color.getSerializedName().equals(name)) {
-                return color;
-            }
-        }
-        return DyeColor.RED;
+    private static boolean isScarf(ItemStack stack) {
+        return SnowmenMod.scarf != null && !stack.isEmpty() && stack.is(SnowmenMod.scarf.get());
     }
 
-    private static Block carpet(String name) {
-        return Compat.carpet(dye(name));
+    /** A scarf in this colour; the default red one has no colour stored. */
+    static ItemStack scarfItem(int rgb) {
+        ItemStack stack = new ItemStack(SnowmenMod.scarf.get());
+        if ((rgb & 0xFFFFFF) != ScarfItem.DEFAULT_COLOR) {
+            stack.set(DataComponents.DYED_COLOR, new DyedItemColor(rgb & 0xFFFFFF));
+        }
+        return stack;
+    }
+
+    /** What a snowman wears: the band (part 0) or the hanging end (part 1), picked by the item model. */
+    static ItemStack scarfPart(int rgb, int part) {
+        ItemStack stack = scarfItem(rgb);
+        stack.set(DataComponents.CUSTOM_MODEL_DATA,
+                new CustomModelData(List.of((float) (part + 1)), List.of(), List.of(), List.of()));
+        return stack;
+    }
+
+    /** The scarf colour saved on a snowman: hex, or a dye name from older test builds. */
+    static int scarfColor(String saved) {
+        if (saved == null) {
+            return ScarfItem.DEFAULT_COLOR;
+        }
+        try {
+            return Integer.parseInt(saved, 16) & 0xFFFFFF;
+        } catch (NumberFormatException e) {
+            for (DyeColor color : DyeColor.values()) {
+                if (color.getSerializedName().equals(saved)) {
+                    return color.getTextureDiffuseColor() & 0xFFFFFF;
+                }
+            }
+            return ScarfItem.DEFAULT_COLOR;
+        }
     }
 }

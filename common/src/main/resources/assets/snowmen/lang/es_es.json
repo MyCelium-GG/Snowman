@@ -21,5 +21,7 @@
   "subtitles.snowmen.snowman.hit": "Muñeco de nieve se tambalea",
   "subtitles.snowmen.snowman.break": "Muñeco de nieve se deshace",
   "subtitles.snowmen.snowman.melt": "Muñeco de nieve se derrite",
-  "subtitles.snowmen.deny": "Cruje la nieve"
+  "subtitles.snowmen.deny": "Cruje la nieve",
+  "item.snowmen.scarf": "Bufanda",
+  "item.snowmen.scarf.hint": "Pónsela a un muñeco de nieve. Se puede teñir."
 }
