@@ -5,7 +5,7 @@
     "index": 0,
     "fallback": {
       "type": "minecraft:model",
-      "model": "snowmen:item/rolled_snowball_3"
+      "model": "snowmen:item/rolled_snowball_6"
     },
     "entries": [
       {
@@ -16,45 +16,150 @@
         }
       },
       {
-        "threshold": 3,
+        "threshold": 2,
         "model": {
           "type": "minecraft:model",
           "model": "snowmen:item/rolled_snowball_2"
         }
       },
       {
-        "threshold": 6,
+        "threshold": 3,
         "model": {
           "type": "minecraft:model",
           "model": "snowmen:item/rolled_snowball_3"
         }
       },
       {
-        "threshold": 10,
+        "threshold": 4,
         "model": {
           "type": "minecraft:model",
           "model": "snowmen:item/rolled_snowball_4"
         }
       },
       {
-        "threshold": 16,
+        "threshold": 5,
         "model": {
           "type": "minecraft:model",
           "model": "snowmen:item/rolled_snowball_5"
         }
       },
       {
-        "threshold": 32,
+        "threshold": 6,
         "model": {
           "type": "minecraft:model",
           "model": "snowmen:item/rolled_snowball_6"
         }
       },
       {
-        "threshold": 64,
+        "threshold": 7,
         "model": {
           "type": "minecraft:model",
           "model": "snowmen:item/rolled_snowball_7"
+        }
+      },
+      {
+        "threshold": 8,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_8"
+        }
+      },
+      {
+        "threshold": 9,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_9"
+        }
+      },
+      {
+        "threshold": 10,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_10"
+        }
+      },
+      {
+        "threshold": 11,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_11"
+        }
+      },
+      {
+        "threshold": 12,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_12"
+        }
+      },
+      {
+        "threshold": 13,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_13"
+        }
+      },
+      {
+        "threshold": 14,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_14"
+        }
+      },
+      {
+        "threshold": 15,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_15"
+        }
+      },
+      {
+        "threshold": 16,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_16"
+        }
+      },
+      {
+        "threshold": 20,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_20"
+        }
+      },
+      {
+        "threshold": 24,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_24"
+        }
+      },
+      {
+        "threshold": 32,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_32"
+        }
+      },
+      {
+        "threshold": 48,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_48"
+        }
+      },
+      {
+        "threshold": 64,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_64"
+        }
+      },
+      {
+        "threshold": 100,
+        "model": {
+          "type": "minecraft:model",
+          "model": "snowmen:item/rolled_snowball_100"
         }
       }
     ]
