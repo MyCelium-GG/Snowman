@@ -64,4 +64,19 @@ class LayoutTest {
                 .filter(p -> p.kind() == Layout.Kind.NOSE).findFirst().orElseThrow();
         return nose.matrix().transformPosition(new Vector3f(0.5f, 0.5f, 1f));
     }
+
+    @Test
+    void onTallStacksTheFaceIsOnTheTopBall() {
+        State s = new State();
+        s.sizes = new int[] {16, 13, 10, 7, 5};
+        s.eyes = true;
+        s.buttons = 1;
+        List<Layout.Piece> pieces = Layout.pieces(s, 0, 0, null);
+        Layout.Piece eye = pieces.stream().filter(p -> p.kind() == Layout.Kind.EYE).findFirst().orElseThrow();
+        Layout.Piece button = pieces.stream().filter(p -> p.kind() == Layout.Kind.BUTTON).findFirst().orElseThrow();
+        float eyeY = eye.matrix().transformPosition(new Vector3f(0.5f)).y;
+        float buttonY = button.matrix().transformPosition(new Vector3f(0.5f)).y;
+        assertTrue(eyeY > Ball.centre(s.sizes, 3) && eyeY < Ball.height(s.sizes), "eyes on the top ball: " + eyeY);
+        assertTrue(Math.abs(buttonY - Ball.centre(s.sizes, 3)) < Ball.scale(7) / 2, "buttons on the ball below: " + buttonY);
+    }
 }

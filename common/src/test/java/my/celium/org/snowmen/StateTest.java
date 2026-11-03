@@ -50,4 +50,14 @@ class StateTest {
         assertFalse(State.isStateTag(State.PART + ".ball.0"));
         assertFalse(State.isStateTag("minecraft.anything"));
     }
+
+    @Test
+    void tallStacksRoundTrip() {
+        State s = new State();
+        s.sizes = new int[] {20, 16, 12, 9, 6, 4};
+        State back = State.read(new HashSet<>(s.tags()));
+        assertArrayEquals(s.sizes, back.sizes);
+        assertTrue(back.complete());
+        assertFalse(State.ball(3).complete());
+    }
 }

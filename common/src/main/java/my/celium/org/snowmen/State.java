@@ -13,6 +13,9 @@ public final class State {
     public static final String ROOT = PREFIX + "root";
     public static final String PART = PREFIX + "part";
 
+    /** Balls a snowman needs. */
+    public static final int SNOWMAN = 3;
+
     public int[] sizes = new int[0];
     public boolean eyes;
     public boolean nose;
@@ -33,8 +36,9 @@ public final class State {
         return s;
     }
 
+    /** Three or more balls make a snowman that can be decorated. */
     public boolean complete() {
-        return sizes.length == 3;
+        return sizes.length >= SNOWMAN;
     }
 
     public boolean decorated() {
@@ -47,8 +51,7 @@ public final class State {
 
     public static State read(Set<String> tags) {
         State s = new State();
-        int[] sizes = new int[3];
-        int count = 0;
+        java.util.TreeMap<Integer, Integer> sizes = new java.util.TreeMap<>();
         for (String tag : tags) {
             if (!tag.startsWith(PREFIX)) {
                 continue;
@@ -57,12 +60,12 @@ public final class State {
             int eq = body.indexOf('=');
             String key = eq < 0 ? body : body.substring(0, eq);
             String value = eq < 0 ? "" : body.substring(eq + 1);
+            if (key.length() > 1 && key.length() <= 4 && key.charAt(0) == 'b'
+                    && key.substring(1).chars().allMatch(Character::isDigit)) {
+                // Ball i of the stack, from the bottom: b0, b1, b2, ...
+                sizes.put(Integer.parseInt(key.substring(1)), Ball.clamp(parse(value, Ball.MIN_SIZE)));
+            }
             switch (key) {
-                case "b0", "b1", "b2" -> {
-                    int i = key.charAt(1) - '0';
-                    sizes[i] = Ball.clamp(parse(value, Ball.MIN_SIZE));
-                    count = Math.max(count, i + 1);
-                }
                 case "eyes" -> s.eyes = true;
                 case "nose" -> s.nose = true;
                 case "hat" -> s.hat = true;
@@ -73,9 +76,10 @@ public final class State {
                 }
             }
         }
+        int count = sizes.isEmpty() ? 0 : sizes.lastKey() + 1;
         s.sizes = new int[count];
         for (int i = 0; i < count; i++) {
-            s.sizes[i] = sizes[i] == 0 ? Ball.MIN_SIZE : sizes[i];
+            s.sizes[i] = sizes.getOrDefault(i, Ball.MIN_SIZE);
         }
         return s;
     }

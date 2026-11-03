@@ -33,6 +33,7 @@ public final class SnowmenMod {
     public static ConfigValue<Boolean> melting;
     public static ConfigValue<Integer> maxBallSize;
     public static ConfigValue<Boolean> snowTrail;
+    public static ConfigValue<Integer> maxStack;
     public static MycelConfig config;
     public static ConfigValue<Boolean> rotateHint;
     public static DeferredEntry<Item> rolledSnowball;
@@ -64,6 +65,8 @@ public final class SnowmenMod {
                 "Snowmen and snowballs slowly melt in places where a snow golem would melt, like deserts and the Nether.");
         maxBallSize = builder.intValue("ballSizeLimit", 0, 0, 1_000_000,
                 "How big a snowball can grow while rolling. 0 means no limit.");
+        maxStack = builder.intValue("maxStackHeight", 5, State.SNOWMAN, 32,
+                "How many snowballs can be stacked. Three make a snowman; more make it taller.");
         snowTrail = builder.booleanValue("snowTrail", true,
                 "Rolling a snowball picks up the snow it rolls over and leaves a trail of bare ground.");
         rotateHint = builder.booleanValue("rotateHint", true,
@@ -73,6 +76,10 @@ public final class SnowmenMod {
 
     public static boolean isModEnabled() {
         return Mycel.isEnabled(ID);
+    }
+
+    public static int maxStack() {
+        return maxStack == null ? 5 : maxStack.get();
     }
 
     public static int maxBallSize() {

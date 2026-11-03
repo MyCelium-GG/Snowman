@@ -62,11 +62,14 @@ public final class Layout {
                 out.add(new Piece(Kind.BALL, i * 4 + k, box, true));
             }
         }
-        if (sizes.length < 2) {
+        if (sizes.length < State.SNOWMAN) {
             return out;
         }
-        float midW = Ball.scale(sizes[1]);
-        float midY = Ball.centre(sizes, 1);
+        // The body is the ball under the head; on taller stacks the balls below are just snow.
+        int body = sizes.length - 2;
+        int head = sizes.length - 1;
+        float midW = Ball.scale(sizes[body]);
+        float midY = Ball.centre(sizes, body);
         float midR = midW / 2;
         for (int b = 0; b < s.buttons; b++) {
             float e = Math.max(0.06f, midW * 0.11f);
@@ -85,11 +88,8 @@ public final class Layout {
                     .scale(len);
             out.add(new Piece(Kind.ARM, a, m, false));
         }
-        if (sizes.length < 3) {
-            return out;
-        }
-        float headW = Ball.scale(sizes[2]);
-        float headY = Ball.centre(sizes, 2);
+        float headW = Ball.scale(sizes[head]);
+        float headY = Ball.centre(sizes, head);
         float headR = headW / 2;
         if (s.eyes) {
             float e = Math.max(0.06f, headW * 0.12f);

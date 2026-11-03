@@ -48,8 +48,9 @@ public final class Ball {
         return centre(sizes, top) + scale(sizes[top]) / 2;
     }
 
-    /** Any snowball goes on top of a stack of one or two; three make a snowman. */
-    public static boolean canStack(int[] below, int carried) {
-        return below.length > 0 && below.length < 3 && carried >= MIN_SIZE;
+    /** A snowball goes on top when it is not bigger than the top one and the stack is below {@code maxStack}. */
+    public static boolean canStack(int[] below, int carried, int maxStack) {
+        return below.length > 0 && below.length < maxStack && carried >= MIN_SIZE
+                && carried <= below[below.length - 1];
     }
 }

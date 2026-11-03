@@ -543,7 +543,7 @@ public final class Snowman {
 
     private static InteractionResult stack(ServerLevel level, Interaction root, State s, ItemStack item, int size,
             Player player) {
-        if (s.decorated() || !Ball.canStack(s.sizes, size)) {
+        if (s.decorated() || !Ball.canStack(s.sizes, size, SnowmenMod.maxStack())) {
             sound(level, root.position(), "deny", 1.0f);
             return InteractionResult.FAIL;
         }
@@ -554,7 +554,8 @@ public final class Snowman {
         if (!player.hasInfiniteMaterials()) {
             item.shrink(1);
         }
-        if (s.complete()) {
+        boolean finished = s.sizes.length == State.SNOWMAN;
+        if (finished) {
             // A finished snowman turns to face whoever built it.
             root.setYRot(player.getYRot() + 180);
         }
@@ -563,7 +564,7 @@ public final class Snowman {
         rebuild(level, root);
         Vec3 top = root.position().add(0, Ball.height(s.sizes), 0);
         sound(level, top, "ball.stack", 1.0f);
-        if (s.complete()) {
+        if (finished) {
             level.sendParticles(ParticleTypes.SNOWFLAKE, top.x, top.y, top.z, 24, 0.4, 0.4, 0.4, 0.02);
             sound(level, top, "snowman.complete", 1.0f);
             sound(level, top, "snowman.complete", 1.5f);
