@@ -3,7 +3,7 @@
 ## [1.0.0] - unreleased
 
 ### Added
-- Pack a snowball from snow, roll it to make it grow, pick it up as a Rolled Snowball and stack three into a snowman.
+- Pack a snowball from snow, push it by walking into it or kick it, and watch it grow as it rolls, pick it up as a Rolled Snowball and stack three into a snowman.
 - Snowballs grow without a size limit; the item shows its size, in the inventory and in your hand.
 - Icy item names, and every snowball size in the creative menu and search.
 - Snowy sounds with subtitles for packing, rolling, growing, stacking, decorating, turning, melting and breaking.

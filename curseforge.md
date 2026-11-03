@@ -5,7 +5,7 @@
 ## How it works
 
 1. **Pack a snowball:** right-click snow with an empty hand
-2. **Roll it:** hit it, and it rolls through the snow, growing as it goes and leaving a trail of grass behind. There's no size limit, so go build a giant
+2. **Roll it:** walk into it to push it through the snow, or hit it to kick it. It grows with every block of snow it picks up and leaves a trail of grass behind. There's no size limit, so go build a giant
 3. **Stack it:** right-click a snowball to pick it up, then right-click a bigger one to put it on top
 4. **Decorate it:** right-click your finished snowman with
    - **coal** for eyes and buttons

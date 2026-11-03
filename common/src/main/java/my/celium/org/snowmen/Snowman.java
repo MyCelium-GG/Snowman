@@ -60,8 +60,8 @@ import org.joml.Vector3f;
  * root's UUID. Displays are not passengers, so they can glide smoothly when the root moves.
  */
 public final class Snowman {
-    /** Ticks a roll takes from one block to the next; clients glide the displays over this time. */
-    private static final int ROLL_TICKS = 5;
+    /** Ticks clients take to glide the displays to where the server moved them. */
+    private static final int MOVE_LERP = 2;
     /** Two hits on a snowman within this many ticks knock it over. */
     private static final int DOUBLE_HIT_TICKS = 12;
     /** How often melting is checked, in ticks. */
@@ -78,7 +78,7 @@ public final class Snowman {
     /** Snowballs dropped when a giant snowman falls apart, at most. */
     private static final int MAX_SNOW_DROPS = 64;
 
-    private static final Map<Interaction, Long> BUSY = new WeakHashMap<>();
+    private static final Map<Interaction, Motion> MOTION = new WeakHashMap<>();
     private static final Map<Interaction, Quaternionf> SPIN = new WeakHashMap<>();
     private static final Map<Interaction, Long> LAST_HIT = new WeakHashMap<>();
     private static final Map<Interaction, int[]> WOBBLE = new WeakHashMap<>();
@@ -251,7 +251,7 @@ public final class Snowman {
         }
         State s = State.read(root.entityTags());
         if (s.sizes.length == 1 && !player.isSecondaryUseActive()) {
-            roll(server, root, s, player);
+            kick(server, root, s, player);
             return true;
         }
         long now = server.getGameTime();
@@ -268,62 +268,220 @@ public final class Snowman {
 
     // ---------------------------------------------------------------- rolling
 
-    private static void roll(ServerLevel level, Interaction root, State s, Player player) {
-        long now = level.getGameTime();
-        Long busy = BUSY.get(root);
-        if (busy != null && now < busy) {
-            return;
-        }
-        Direction dir = Direction.fromYRot(player.getYRot());
-        BlockPos to = root.blockPosition().relative(dir);
-        if (!canOccupy(level, to)) {
-            if (canOccupy(level, to.below()) && level.getBlockState(to).canBeReplaced()) {
-                to = to.below();
-            } else {
-                sound(level, root.position(), "deny", 1.0f);
+    /** How a lone snowball is moving right now. Not saved: a ball at rest has none. */
+    private static final class Motion {
+        double vx;
+        double vz;
+        double sinceSound;
+        BlockPos lastCell;
+    }
+
+    /** A hit kicks the ball away from the player, in the direction of the hit. Every hit adds speed. */
+    private static void kick(ServerLevel level, Interaction root, State s, Player player) {
+        double dx = root.getX() - player.getX();
+        double dz = root.getZ() - player.getZ();
+        double len = Math.hypot(dx, dz);
+        if (len < 1e-3) {
+            Vec3 look = player.getLookAngle();
+            dx = look.x;
+            dz = look.z;
+            len = Math.hypot(dx, dz);
+            if (len < 1e-3) {
                 return;
             }
-        } else if (canOccupy(level, to.below()) && level.getBlockState(to.below()).canBeReplaced()
-                && !(level.getBlockState(to).getBlock() instanceof SnowLayerBlock)) {
-            to = to.below();
         }
-        if (rootAt(level, to, root) != null) {
-            sound(level, root.position(), "deny", 1.0f);
+        double speed = Roll.kick(s.top());
+        Motion m = MOTION.computeIfAbsent(root, r -> new Motion());
+        m.vx += dx / len * speed;
+        m.vz += dz / len * speed;
+        double v = Math.hypot(m.vx, m.vz);
+        if (v > Roll.MAX_SPEED) {
+            m.vx *= Roll.MAX_SPEED / v;
+            m.vz *= Roll.MAX_SPEED / v;
+        }
+        sound(level, root.position(), "snowman.hit", Math.max(0.6f, 1.2f - s.top() * 0.02f));
+    }
+
+    /** Players walking into a lone snowball push it ahead of them. */
+    private static void push(ServerLevel level, Interaction root, State s) {
+        float r = Ball.scale(s.top()) / 2;
+        double reach = r + 0.5;
+        for (Player p : level.getEntitiesOfClass(Player.class,
+                root.getBoundingBox().inflate(reach + 0.5, 1.5, reach + 0.5))) {
+            if (p.isSpectator() || Math.abs(p.getY() - root.getY()) > Math.max(1.2, r * 2)) {
+                continue;
+            }
+            double dx = root.getX() - p.getX();
+            double dz = root.getZ() - p.getZ();
+            double d = Math.hypot(dx, dz);
+            if (d > reach || d < 1e-3) {
+                continue;
+            }
+            Vec3 movement = p.getKnownMovement();
+            double toward = (movement.x * dx + movement.z * dz) / d;
+            if (toward <= 0.02) {
+                continue;
+            }
+            // Keep pace with the player, and get back out in front if they caught up, so the
+            // ball always rolls ahead of you instead of you walking through it.
+            double want = toward * Roll.pushFactor(s.top()) + Math.max(0, reach - d) * Roll.CATCH_UP;
+            Motion m = MOTION.computeIfAbsent(root, k -> new Motion());
+            double along = (m.vx * dx + m.vz * dz) / d;
+            if (along < want) {
+                m.vx += dx / d * (want - along);
+                m.vz += dz / d * (want - along);
+            }
+        }
+    }
+
+    /** One tick of rolling: move, follow the ground, grow on snow, spin, slow down. */
+    private static void step(ServerLevel level, Interaction root, State s) {
+        Motion m = MOTION.get(root);
+        if (m == null) {
             return;
         }
+        if (Math.hypot(m.vx, m.vz) < Roll.MIN_SPEED) {
+            MOTION.remove(root);
+            return;
+        }
+        Vec3 from = root.position();
+        // X and Z separately, so the ball slides along a wall instead of stopping dead.
+        Vec3 pos = from;
+        Vec3 next = move(level, root, s, pos, m.vx, 0);
+        if (next == null) {
+            bounce(level, root, s, m.vx);
+            m.vx = -m.vx * Roll.BOUNCE;
+        } else {
+            pos = next;
+        }
+        next = move(level, root, s, pos, 0, m.vz);
+        if (next == null) {
+            bounce(level, root, s, m.vz);
+            m.vz = -m.vz * Roll.BOUNCE;
+        } else {
+            pos = next;
+        }
+        double moved = Math.hypot(pos.x - from.x, pos.z - from.z);
         int size = s.top();
-        int max = SnowmenMod.maxBallSize();
-        if (level.getBlockState(to).getBlock() instanceof SnowLayerBlock) {
-            size = Math.min(max, size + 1);
-            if (SnowmenMod.snowTrail == null || SnowmenMod.snowTrail.get()) {
-                level.removeBlock(to, false);
+        boolean onSnow = false;
+        BlockPos cell = BlockPos.containing(pos.x, pos.y + 0.01, pos.z);
+        BlockState there = level.getBlockState(cell);
+        if (there.getBlock() instanceof SnowLayerBlock) {
+            onSnow = true;
+        } else if (level.getBlockState(cell.below()).is(Blocks.SNOW_BLOCK)
+                || level.getBlockState(cell.below()).is(Blocks.POWDER_SNOW)) {
+            onSnow = true;
+        }
+        if (!cell.equals(m.lastCell)) {
+            // Every new block of snow the ball rolls onto adds one size.
+            m.lastCell = cell;
+            if (onSnow) {
+                size = Math.min(SnowmenMod.maxBallSize(), size + 1);
             }
-        } else if (level.getBlockState(to.below()).is(Blocks.SNOW_BLOCK)
-                || level.getBlockState(to.below()).is(Blocks.POWDER_SNOW)) {
-            size = Math.min(max, size + 1);
         }
-        // Spin around the axis across the direction of travel: one block of travel turns the
-        // ball by (distance / radius) radians, like a real ball rolling.
-        Vector3f axis = new Vector3f(dir.getStepZ(), 0, -dir.getStepX());
-        Quaternionf spin = SPIN.computeIfAbsent(root, r -> new Quaternionf());
-        new Quaternionf().rotateAxis(1.0f / (Ball.scale(size) / 2), axis).mul(spin, spin);
-        boolean grew = size != s.sizes[0];
-        s.sizes[0] = size;
-        writeState(root, s);
-        Vec3 target = Vec3.atBottomCenterOf(to);
-        if (grew) {
-            sound(level, target, "ball.grow", Math.max(0.5f, 1.4f - size * 0.02f));
+        if (SnowmenMod.snowTrail == null || SnowmenMod.snowTrail.get()) {
+            clearTrail(level, pos, Ball.scale(size) / 2);
         }
-        root.snapTo(target);
-        resize(root, s);
+        if (moved > 1e-4) {
+            Vector3f axis = new Vector3f((float) (pos.z - from.z), 0, (float) -(pos.x - from.x)).normalize();
+            Quaternionf spin = SPIN.computeIfAbsent(root, r -> new Quaternionf());
+            new Quaternionf().rotateAxis(Roll.spinStep(moved, size), axis).mul(spin, spin);
+        }
+        if (size != s.top()) {
+            s.sizes[0] = size;
+            writeState(root, s);
+            resize(root, s);
+            sound(level, pos, "ball.grow", Math.max(0.5f, 1.4f - size * 0.02f));
+        }
+        root.snapTo(pos);
         for (Display part : parts(root)) {
-            part.snapTo(target.x, target.y, target.z, 0, 0);
+            part.snapTo(pos.x, pos.y, pos.z, 0, 0);
         }
-        layout(root, s, ROLL_TICKS, 0);
-        BUSY.put(root, now + ROLL_TICKS - 1);
-        level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SNOW_BLOCK.defaultBlockState()),
-                target.x, target.y + 0.1, target.z, 6, 0.25, 0.05, 0.25, 0.05);
-        sound(level, target, "ball.roll", 0.9f + level.getRandom().nextFloat() * 0.2f);
+        layout(root, s, MOVE_LERP, 0);
+        m.sinceSound += moved;
+        if (m.sinceSound >= Roll.SOUND_STEP) {
+            m.sinceSound = 0;
+            sound(level, pos, "ball.roll", Math.max(0.55f, 1.15f - size * 0.025f)
+                    + level.getRandom().nextFloat() * 0.1f);
+            level.sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.SNOW_BLOCK.defaultBlockState()),
+                    pos.x, pos.y + 0.1, pos.z, 4, Ball.scale(size) * 0.3, 0.05, Ball.scale(size) * 0.3, 0.05);
+        }
+        double friction = onSnow ? Roll.FRICTION_SNOW : Roll.FRICTION;
+        m.vx *= friction;
+        m.vz *= friction;
+    }
+
+    /** Where the ball ends up after moving (dx, dz), following the ground; null when something is in the way. */
+    private static Vec3 move(ServerLevel level, Interaction root, State s, Vec3 from, double dx, double dz) {
+        if (dx == 0 && dz == 0) {
+            return from;
+        }
+        double nx = from.x + dx;
+        double nz = from.z + dz;
+        BlockPos cell = BlockPos.containing(nx, from.y + 0.01, nz);
+        double y = from.y;
+        if (canOccupy(level, cell)) {
+            y = cell.getY();
+        } else if (level.getBlockState(cell).canBeReplaced() || level.getBlockState(cell).isAir()) {
+            // Nothing to stand on: roll down, up to four blocks.
+            int drop = 0;
+            for (int i = 1; i <= 4; i++) {
+                if (canOccupy(level, cell.below(i))) {
+                    drop = i;
+                    break;
+                }
+                if (!level.getBlockState(cell.below(i)).canBeReplaced()) {
+                    break;
+                }
+            }
+            if (drop == 0) {
+                return null;
+            }
+            y = cell.getY() - drop;
+        } else if (Ball.scale(s.top()) >= 0.9 && canOccupy(level, cell.above())
+                && level.getBlockState(BlockPos.containing(from.x, from.y + 1.01, from.z)).canBeReplaced()) {
+            // Big balls roll up a one-block step.
+            y = cell.getY() + 1;
+        } else {
+            return null;
+        }
+        float r = Ball.scale(s.top()) / 2;
+        for (Interaction other : level.getEntitiesOfClass(Interaction.class,
+                new AABB(nx - 3, y - 2, nz - 3, nx + 3, y + 3, nz + 3))) {
+            if (other == root || !isRoot(other)) {
+                continue;
+            }
+            float or = Ball.scale(State.read(other.entityTags()).sizes.length == 0 ? 1
+                    : State.read(other.entityTags()).sizes[0]) / 2;
+            if (Math.hypot(other.getX() - nx, other.getZ() - nz) < (r + or) * 0.85
+                    && Math.abs(other.getY() - y) < 1.5) {
+                return null;
+            }
+        }
+        return new Vec3(nx, y, nz);
+    }
+
+    /** A thump when a fast ball hits a wall. */
+    private static void bounce(ServerLevel level, Interaction root, State s, double speed) {
+        if (Math.abs(speed) > 0.12) {
+            sound(level, root.position(), "deny", 1.0f);
+        }
+    }
+
+    /** Picks up the snow under the ball: a trail as wide as the ball, at most three blocks. */
+    private static void clearTrail(ServerLevel level, Vec3 pos, float radius) {
+        float r = Math.min(1.5f, radius * 0.8f);
+        int reach = (int) Math.ceil(r);
+        BlockPos centre = BlockPos.containing(pos.x, pos.y + 0.01, pos.z);
+        for (int dx = -reach; dx <= reach; dx++) {
+            for (int dz = -reach; dz <= reach; dz++) {
+                BlockPos at = centre.offset(dx, 0, dz);
+                if (Math.hypot(at.getX() + 0.5 - pos.x, at.getZ() + 0.5 - pos.z) <= Math.max(0.5f, r)
+                        && level.getBlockState(at).getBlock() instanceof SnowLayerBlock) {
+                    level.removeBlock(at, false);
+                }
+            }
+        }
     }
 
     /** Free space with something solid (or deep snow) to rest on. */
@@ -462,6 +620,11 @@ public final class Snowman {
     public static void tick(Interaction root) {
         if (!(root.level() instanceof ServerLevel level) || !isRoot(root)) {
             return;
+        }
+        State now = State.read(root.entityTags());
+        if (now.sizes.length == 1) {
+            push(level, root, now);
+            step(level, root, now);
         }
         int[] wobble = WOBBLE.get(root);
         if (wobble != null && --wobble[0] <= 0) {
@@ -654,7 +817,7 @@ public final class Snowman {
             display.addTag(partTag(piece));
             DisplayAccessor d = (DisplayAccessor) display;
             d.snowmen$setTransformation(new Transformation(piece.matrix()));
-            d.snowmen$setPosRotInterpolationDuration(ROLL_TICKS);
+            d.snowmen$setPosRotInterpolationDuration(MOVE_LERP);
             if (piece.kind() == Layout.Kind.BALL && piece.index() == 0) {
                 d.snowmen$setShadowRadius(Ball.scale(s.sizes[0]) * 0.45f);
             }
@@ -770,7 +933,7 @@ public final class Snowman {
             part.discard();
         }
         PARTS.remove(root);
-        BUSY.remove(root);
+        MOTION.remove(root);
         SPIN.remove(root);
         root.discard();
     }
