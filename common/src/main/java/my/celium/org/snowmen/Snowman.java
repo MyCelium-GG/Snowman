@@ -158,7 +158,12 @@ public final class Snowman {
         }
         BlockState state = level.getBlockState(pos);
         BlockPos at = state.canBeReplaced() || state.getBlock() instanceof SnowLayerBlock ? pos : pos.relative(face);
-        if (!canOccupy(server, at) || rootAt(server, at, null) != null) {
+        // Clicking the ground right at a snowball (easy with small ones) stacks onto it too.
+        Interaction there = rootAt(server, at, null);
+        if (there != null && player != null) {
+            return stack(server, there, State.read(there.entityTags()), held, size, player);
+        }
+        if (!canOccupy(server, at)) {
             sound(server, Vec3.atCenterOf(at), "deny", 1.0f);
             return InteractionResult.FAIL;
         }
@@ -796,7 +801,7 @@ public final class Snowman {
 
     private static void resize(Interaction root, State s) {
         InteractionAccessor box = (InteractionAccessor) root;
-        box.snowmen$setWidth(s.sizes.length == 0 ? 0 : Ball.scale(s.sizes[0]));
+        box.snowmen$setWidth(Ball.widest(s.sizes));
         box.snowmen$setHeight(Ball.height(s.sizes));
         root.refreshDimensions();
     }

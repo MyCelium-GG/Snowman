@@ -21,6 +21,15 @@ public final class Ball {
         return Math.max(MIN_SIZE, size);
     }
 
+    /** Width of the widest ball in a stack. */
+    public static float widest(int[] sizes) {
+        float w = 0;
+        for (int size : sizes) {
+            w = Math.max(w, scale(size));
+        }
+        return w;
+    }
+
     /** Height of the centre of ball {@code index} above the ground, for a stack of these sizes. */
     public static float centre(int[] sizes, int index) {
         float y = 0;
@@ -39,8 +48,8 @@ public final class Ball {
         return centre(sizes, top) + scale(sizes[top]) / 2;
     }
 
-    /** A ball may only go on top of a bigger one, and a snowman has three. */
+    /** Any snowball goes on top of a stack of one or two; three make a snowman. */
     public static boolean canStack(int[] below, int carried) {
-        return below.length > 0 && below.length < 3 && carried < below[below.length - 1];
+        return below.length > 0 && below.length < 3 && carried >= MIN_SIZE;
     }
 }

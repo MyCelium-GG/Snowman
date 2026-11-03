@@ -27,12 +27,13 @@ class BallTest {
     }
 
     @Test
-    void onlySmallerBallsGoOnTopAndThreeIsTheLimit() {
+    void anySizeGoesOnTopAndThreeIsTheLimit() {
         assertTrue(Ball.canStack(new int[] {12}, 8));
-        assertFalse(Ball.canStack(new int[] {12}, 12));
-        assertFalse(Ball.canStack(new int[] {12, 8}, 9));
-        assertTrue(Ball.canStack(new int[] {12, 8}, 5));
+        assertTrue(Ball.canStack(new int[] {12}, 12));
+        assertTrue(Ball.canStack(new int[] {5}, 20), "bigger balls may go on top too");
+        assertTrue(Ball.canStack(new int[] {12, 8}, 30));
         assertFalse(Ball.canStack(new int[] {12, 8, 5}, 2));
         assertFalse(Ball.canStack(new int[0], 2));
+        assertEquals(Ball.scale(30), Ball.widest(new int[] {12, 30, 5}), 1e-5);
     }
 }
