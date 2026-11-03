@@ -38,6 +38,11 @@ public final class Layout {
         for (int i = 0; i < sizes.length; i++) {
             float w = Ball.scale(sizes[i]);
             float y = Ball.centre(sizes, i);
+            if (roll != null && sizes.length == 1) {
+                // A tumbling ball rests on whatever point is lowest right now, so its corners
+                // never poke into the ground.
+                y = restHeight(w, roll);
+            }
             // Three crossed boxes make the ball look round instead of like a cube; a fourth fills the inside.
             float[][] dims = {{w, w * ROUND, w * ROUND}, {w * ROUND, w, w * ROUND}, {w * ROUND, w * ROUND, w}};
             for (int k = 0; k < 4; k++) {
@@ -132,6 +137,22 @@ public final class Layout {
             out.add(new Piece(Kind.HAT, 0, m, false));
         }
         return out;
+    }
+
+    /** Height of the centre of a ball of width {@code w}, turned by {@code roll}, resting on the ground. */
+    static float restHeight(float w, Quaternionf roll) {
+        float[][] dims = {{w, w * ROUND, w * ROUND}, {w * ROUND, w, w * ROUND}, {w * ROUND, w * ROUND, w}};
+        float lowest = 0;
+        org.joml.Vector3f corner = new org.joml.Vector3f();
+        for (float[] d : dims) {
+            for (int c = 0; c < 8; c++) {
+                corner.set(((c & 1) == 0 ? -0.5f : 0.5f) * d[0], ((c & 2) == 0 ? -0.5f : 0.5f) * d[1],
+                        ((c & 4) == 0 ? -0.5f : 0.5f) * d[2]);
+                roll.transform(corner);
+                lowest = Math.min(lowest, corner.y);
+            }
+        }
+        return -lowest;
     }
 
     /** How far the round front of a ball sticks out at height {@code dy} above its centre. */

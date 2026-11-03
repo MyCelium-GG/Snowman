@@ -274,6 +274,8 @@ public final class Snowman {
         double vz;
         double sinceSound;
         BlockPos lastCell;
+        /** Blocks whose snow this ball picked up recently, oldest first. */
+        final java.util.LinkedHashSet<Long> picked = new java.util.LinkedHashSet<>();
     }
 
     /** A hit kicks the ball away from the player, in the direction of the hit. Every hit adds speed. */
@@ -342,6 +344,7 @@ public final class Snowman {
         }
         if (Math.hypot(m.vx, m.vz) < Roll.MIN_SPEED) {
             MOTION.remove(root);
+            settle(root, s);
             return;
         }
         Vec3 from = root.position();
@@ -363,24 +366,21 @@ public final class Snowman {
         }
         double moved = Math.hypot(pos.x - from.x, pos.z - from.z);
         int size = s.top();
-        boolean onSnow = false;
         BlockPos cell = BlockPos.containing(pos.x, pos.y + 0.01, pos.z);
-        BlockState there = level.getBlockState(cell);
-        if (there.getBlock() instanceof SnowLayerBlock) {
-            onSnow = true;
-        } else if (level.getBlockState(cell.below()).is(Blocks.SNOW_BLOCK)
-                || level.getBlockState(cell.below()).is(Blocks.POWDER_SNOW)) {
-            onSnow = true;
+        boolean onSnow = level.getBlockState(cell).getBlock() instanceof SnowLayerBlock
+                || level.getBlockState(cell.below()).is(Blocks.SNOW_BLOCK)
+                || level.getBlockState(cell.below()).is(Blocks.POWDER_SNOW);
+        if (SnowmenMod.snowTrail == null || SnowmenMod.snowTrail.get()) {
+            clearTrail(level, pos, trailRadius(Ball.scale(size) / 2), m.picked);
         }
+        // One size for every block of snow the ball rolls onto. That block counts when it still
+        // has snow, or when this ball's own (wider) trail picked its snow up a moment earlier;
+        // each picked block counts once, so rolling back over the trail adds nothing.
         if (!cell.equals(m.lastCell)) {
-            // Every new block of snow the ball rolls onto adds one size.
             m.lastCell = cell;
-            if (onSnow) {
+            if (m.picked.remove(cell.asLong()) || onSnow) {
                 size = Math.min(SnowmenMod.maxBallSize(), size + 1);
             }
-        }
-        if (SnowmenMod.snowTrail == null || SnowmenMod.snowTrail.get()) {
-            clearTrail(level, pos, Ball.scale(size) / 2);
         }
         if (moved > 1e-4) {
             Vector3f axis = new Vector3f((float) (pos.z - from.z), 0, (float) -(pos.x - from.x)).normalize();
@@ -419,18 +419,18 @@ public final class Snowman {
         double nx = from.x + dx;
         double nz = from.z + dz;
         BlockPos cell = BlockPos.containing(nx, from.y + 0.01, nz);
-        double y = from.y;
+        double y;
         if (canOccupy(level, cell)) {
             y = cell.getY();
-        } else if (level.getBlockState(cell).canBeReplaced() || level.getBlockState(cell).isAir()) {
-            // Nothing to stand on: roll down, up to four blocks.
+        } else if (free(level, cell)) {
+            // Nothing to stand on: roll down, up to four blocks. Snowballs never roll uphill.
             int drop = 0;
             for (int i = 1; i <= 4; i++) {
                 if (canOccupy(level, cell.below(i))) {
                     drop = i;
                     break;
                 }
-                if (!level.getBlockState(cell.below(i)).canBeReplaced()) {
+                if (!free(level, cell.below(i))) {
                     break;
                 }
             }
@@ -438,27 +438,52 @@ public final class Snowman {
                 return null;
             }
             y = cell.getY() - drop;
-        } else if (Ball.scale(s.top()) >= 0.9 && canOccupy(level, cell.above())
-                && level.getBlockState(BlockPos.containing(from.x, from.y + 1.01, from.z)).canBeReplaced()) {
-            // Big balls roll up a one-block step.
-            y = cell.getY() + 1;
         } else {
             return null;
         }
-        float r = Ball.scale(s.top()) / 2;
+        // The front of the ball needs room too, at every height the ball covers.
+        float width = Ball.scale(s.top());
+        float r = width / 2;
+        double edgeX = nx + Math.signum(dx) * r * 0.85;
+        double edgeZ = nz + Math.signum(dz) * r * 0.85;
+        int levels = Math.max(1, (int) Math.ceil(width * 0.85));
+        for (int i = 0; i < levels; i++) {
+            if (!free(level, BlockPos.containing(edgeX, y + 0.01 + i, edgeZ))) {
+                return null;
+            }
+        }
         for (Interaction other : level.getEntitiesOfClass(Interaction.class,
-                new AABB(nx - 3, y - 2, nz - 3, nx + 3, y + 3, nz + 3))) {
+                new AABB(nx - 3 - r, y - 2, nz - 3 - r, nx + 3 + r, y + 3 + width, nz + 3 + r))) {
             if (other == root || !isRoot(other)) {
                 continue;
             }
-            float or = Ball.scale(State.read(other.entityTags()).sizes.length == 0 ? 1
-                    : State.read(other.entityTags()).sizes[0]) / 2;
+            int[] sizes = State.read(other.entityTags()).sizes;
+            float or = Ball.scale(sizes.length == 0 ? 1 : sizes[0]) / 2;
             if (Math.hypot(other.getX() - nx, other.getZ() - nz) < (r + or) * 0.85
                     && Math.abs(other.getY() - y) < 1.5) {
                 return null;
             }
         }
         return new Vec3(nx, y, nz);
+    }
+
+    /** Space a snowball can roll through: air, plants, any depth of snow. */
+    private static boolean free(ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return state.isAir() || state.canBeReplaced() || state.getBlock() instanceof SnowLayerBlock;
+    }
+
+    /**
+     * When a ball stops, it tips onto its nearest flat side. The ball looks the same from all
+     * six sides, so that side is the nearest quarter-turn orientation, and the tip is small.
+     */
+    private static void settle(Interaction root, State s) {
+        Quaternionf spin = SPIN.get(root);
+        if (spin == null) {
+            return;
+        }
+        spin.set(Roll.nearestQuarterTurn(spin));
+        layout(root, s, 4, 0);
     }
 
     /** A thump when a fast ball hits a wall. */
@@ -468,20 +493,31 @@ public final class Snowman {
         }
     }
 
-    /** Picks up the snow under the ball: a trail as wide as the ball, at most three blocks. */
-    private static void clearTrail(ServerLevel level, Vec3 pos, float radius) {
-        float r = Math.min(1.5f, radius * 0.8f);
+    /** Half the width of the trail a ball of this radius leaves: from half a block up to 1.5 blocks. */
+    private static float trailRadius(float ballRadius) {
+        return Math.max(0.5f, Math.min(1.5f, ballRadius * 0.8f));
+    }
+
+    /** Picks up the snow within {@code r} of the ball's centre. Returns how many blocks of snow. */
+    private static int clearTrail(ServerLevel level, Vec3 pos, float r, java.util.LinkedHashSet<Long> picked) {
+        int cleared = 0;
         int reach = (int) Math.ceil(r);
         BlockPos centre = BlockPos.containing(pos.x, pos.y + 0.01, pos.z);
         for (int dx = -reach; dx <= reach; dx++) {
             for (int dz = -reach; dz <= reach; dz++) {
                 BlockPos at = centre.offset(dx, 0, dz);
-                if (Math.hypot(at.getX() + 0.5 - pos.x, at.getZ() + 0.5 - pos.z) <= Math.max(0.5f, r)
+                if (Math.hypot(at.getX() + 0.5 - pos.x, at.getZ() + 0.5 - pos.z) <= r
                         && level.getBlockState(at).getBlock() instanceof SnowLayerBlock) {
                     level.removeBlock(at, false);
+                    cleared++;
+                    picked.add(at.asLong());
+                    if (picked.size() > 64) {
+                        picked.remove(picked.iterator().next());
+                    }
                 }
             }
         }
+        return cleared;
     }
 
     /** Free space with something solid (or deep snow) to rest on. */

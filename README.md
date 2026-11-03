@@ -3,7 +3,7 @@
 Build your own snowman. Roll a snowball through the snow until it is big enough, stack three, and decorate it.
 
 - **Pack a snowball:** right-click snow with an empty hand.
-- **Roll it:** walk into it to push it ahead of you, or hit it to kick it away. It rolls smoothly in any direction, slows down on its own, slides along walls, rolls down drops and (once it's big) up single steps. Every block of snow it rolls onto adds one size, with no size limit, and it leaves a trail of bare ground as wide as the ball. Bigger balls are heavier, so a kick sends them less far.
+- **Roll it:** walk into it to push it ahead of you, or hit it to kick it away. It rolls smoothly in any direction, slows down on its own, slides along walls, rolls down drops but never uphill. Every block it rolls over snow adds one size, with no size limit, and it leaves a trail of bare ground as wide as the ball. Bigger balls are heavier, so a kick sends them less far.
 - **Pick it up:** right-click a snowball with an empty hand. It becomes a Rolled Snowball item that keeps its size and looks bigger the bigger it is, in the inventory and in your hand. Right-click the ground to put it down again. In creative, every size up to 16 (and a few bigger ones) is in Tools & Utilities and in the search.
 - **Stack it:** right-click a bigger snowball while holding a smaller Rolled Snowball. Three make a snowman, and it turns to face you.
 - **Turn it:** stand next to a finished snowman and press **R** (sneak + R turns the other way). The key can be changed in Controls.
@@ -33,7 +33,7 @@ Every action has its own snowy sound (with subtitles), built from vanilla sound 
 | Setting | Default | What it does |
 |---|---|---|
 | Melting | On | Snowmen slowly shrink and finally fall apart where a snow golem would melt |
-| Max ball size | 0 (no limit) | How big a snowball can grow while rolling |
+| Ball size limit | 0 (no limit) | How big a snowball can grow while rolling |
 | Snow trail | On | Rolling picks up the snow and leaves bare ground behind |
 | Rotate hint | On | Shows "Press R to turn the snowman" above the hotbar next to a finished snowman |
 

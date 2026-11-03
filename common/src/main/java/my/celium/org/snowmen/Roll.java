@@ -1,5 +1,7 @@
 package my.celium.org.snowmen;
 
+import org.joml.Quaternionf;
+
 /**
  * How a lone snowball moves: speeds in blocks per tick. Pure math, so it is unit tested.
  * Bigger balls are heavier: kicks send them less far and pushing them is slower.
@@ -43,6 +45,46 @@ public final class Roll {
     /** {@link #spin}, capped to what one tick can show. */
     public static float spinStep(double distance, int size) {
         return Math.min(MAX_SPIN_STEP, spin(distance, size));
+    }
+
+    /** The 24 orientations that turn a cube into itself. */
+    private static final Quaternionf[] QUARTER_TURNS = quarterTurns();
+
+    private static Quaternionf[] quarterTurns() {
+        java.util.List<Quaternionf> found = new java.util.ArrayList<>();
+        float h = (float) (Math.PI / 2);
+        for (int x = 0; x < 4; x++) {
+            for (int y = 0; y < 4; y++) {
+                for (int z = 0; z < 4; z++) {
+                    Quaternionf q = new Quaternionf().rotateXYZ(x * h, y * h, z * h);
+                    boolean seen = false;
+                    for (Quaternionf f : found) {
+                        if (Math.abs(f.dot(q)) > 0.999f) {
+                            seen = true;
+                            break;
+                        }
+                    }
+                    if (!seen) {
+                        found.add(q);
+                    }
+                }
+            }
+        }
+        return found.toArray(new Quaternionf[0]);
+    }
+
+    /** The quarter-turn orientation closest to {@code q}: the ball resting on its nearest flat side. */
+    public static Quaternionf nearestQuarterTurn(Quaternionf q) {
+        Quaternionf best = QUARTER_TURNS[0];
+        float bestDot = -1;
+        for (Quaternionf t : QUARTER_TURNS) {
+            float dot = Math.abs(t.dot(q));
+            if (dot > bestDot) {
+                bestDot = dot;
+                best = t;
+            }
+        }
+        return new Quaternionf(best);
     }
 
     /** How far a ball rolls from {@code speed} until it stops, on snow. */
