@@ -18,17 +18,25 @@
 
 <img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/about.svg" alt="Snowman Roll a snowball through the snow until it is big enough, stack three, and decorate it. Every snowman turns out different, because you decide how big each snowball gets." width="100%">
 
+![A snowman with a top hat and a red scarf in falling snow](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/snowman.png)
+
 ![How it works](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/how-it-works.svg)
 
 <img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/how-it-works-box.svg" alt="Pack a snowball: Right-click snow with an empty hand. Roll it: Walk into it to push it, or hit it to kick it away. It rolls smoothly in any direction, slides along walls and rolls down drops, but never uphill. Every block of snow it rolls over adds one size, with no size limit, and leaves bare ground behind. Pick it up: Right-click a snowball with an empty hand. It becomes a Rolled Snowball item t" width="100%">
+
+![Snowballs rolled through snow, each leaving a trail of grass](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/rolling.png)
 
 ![Decorating](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/decorating.svg)
 
 <img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/decorating-box.svg" alt="Coal or charcoal: Eyes first, then up to three buttons. A carrot: The nose. Sticks: Up to two arms. A Scarf: Knitted, with a hanging end. Dye it any colour, like leather armor. A Top Hat: A snowman wearing one never melts. Anything else: A hat. Blocks like a carved pumpkin go over the head, items like a bucket sit on top. Take things off: Sneak and right-click with an empty hand. Hit a snowman twi" width="100%">
 
+![A snowman wearing a carved pumpkin as its head](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/pumpkin.png)
+
 ![Recipes](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/recipes.svg)
 
 <img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/recipes-box.svg" alt="Scarf: Three wool in a row and one more under the right end. Craft it with any dye to colour it. Top Hat: Black wool on top, red dye in the middle, three black wool at the bottom." width="100%">
+
+![Rolled Snowballs of different sizes and a Top Hat in the inventory](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/items.png)
 
 ![Settings](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/settings.svg)
 
