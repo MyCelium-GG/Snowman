@@ -3,6 +3,7 @@
 </p>
 
 <p align="center">
+  <a href="https://www.curseforge.com/minecraft/mc-mods/snowman"><img src="https://img.shields.io/curseforge/dt/1800279?style=flat-square&logo=curseforge&logoColor=white&label=downloads&color=F16436" alt="CurseForge downloads"></a>
   <a href="https://www.curseforge.com/minecraft/mc-mods/snowman/files"><img src="https://img.shields.io/badge/Minecraft-26.1%20--%2026.3-62B47A?style=flat-square" alt="Minecraft 26.1 to 26.3"></a>
   <img src="https://img.shields.io/badge/loaders-Fabric%2C%20Forge%2C%20NeoForge-1E88E5?style=flat-square" alt="Fabric, Forge, NeoForge">
   <img src="https://img.shields.io/badge/side-client%20%2B%20server-8E44AD?style=flat-square" alt="Client and server">
