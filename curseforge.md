@@ -1,6 +1,6 @@
 # Snowman
 
-**Build a real snowman.** Roll a snowball through the snow and watch it grow, stack three, then give it a face, arms, a scarf and a hat.
+**Snowman** is a Minecraft mod that lets you build real snowmen by hand. Pack a snowball from snow, roll it through the snow so it grows bigger with every block, stack three snowballs on top of each other, and decorate your snowman with coal eyes and buttons, a carrot nose, stick arms, a knitted scarf and a hat. It adds three new items: the Rolled Snowball, the craftable Top Hat and the dyeable Scarf.
 
 ![A snowman with a top hat and a red scarf in falling snow](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/snowman.png)
 
