@@ -27,4 +27,6 @@ Every snowman turns out different, because you decide how big each snowball gets
 - Top Hat recipe: black wool on top, red dye in the middle, three black wool at the bottom
 - Scarf recipe: three wool in a row, one more under the right end; dye it like leather armor
 - Settings: turn melting or the snow trail off, or change how big snowballs can grow
-- Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel)
+- Install it on the server and on every client: it adds new items
+- Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3
+- Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Without it the game still starts, and Snowman tells you in chat that Mycel is missing

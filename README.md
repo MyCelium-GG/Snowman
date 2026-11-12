@@ -33,7 +33,7 @@ WWW      W = any wool
 BBB
 ```
 
-Every action has its own snowy sound (with subtitles), built from vanilla sound files. Snowmen are made of vanilla display entities. The mod adds two items, the Rolled Snowball and the Top Hat, so it is needed on both the server and the client. Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3.
+Every action has its own snowy sound (with subtitles), built from vanilla sound files. Snowmen are made of vanilla display entities. The mod adds three items, the Rolled Snowball, the Top Hat and the Scarf, so it is needed on both the server and the client. Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel): without it the game still starts, Snowman stays off and tells you in chat that Mycel is missing. Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3.
 
 ## Settings
 
