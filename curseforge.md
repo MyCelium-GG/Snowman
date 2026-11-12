@@ -2,6 +2,8 @@
 
 **Build a real snowman.** Roll a snowball through the snow and watch it grow, stack three, then give it a face, arms, a scarf and a hat.
 
+![A snowman with a top hat and a red scarf in falling snow](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/snowman.png)
+
 ## How it works
 
 1. **Pack a snowball:** right-click snow with an empty hand
@@ -15,7 +17,11 @@
    - a **Top Hat** you can craft, and your snowman never melts
    - **anything else** for a hat: a bucket, a pumpkin, a flower, a helmet
 
+![A snowman wearing a carved pumpkin as its head](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/pumpkin.png)
+
 Every snowman turns out different, because you decide how big each snowball gets. Picked-up snowballs keep their size, and you can see it in your inventory.
+
+![Snowballs rolled through snow, each leaving a trail of grass](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/rolling.png)
 
 ## Good to know
 
