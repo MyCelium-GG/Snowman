@@ -91,7 +91,7 @@ jobs:
         uses: MyCelium-GG/MyCel-Lib/.github/actions/curseforge-upload@v1
         with:
           token: ${{ secrets.CURSEFORGE_TOKEN }}
-          name: Snowmen
+          name: Snowman
           version: ${{ env.TAG }}
           minecraft-version: ${{ env.MC_VERSIONS }}
           files: |
@@ -122,7 +122,7 @@ jobs:
             exit 0
           fi
           gh release create "$TAG" \
-            --title "Snowmen $TAG" \
+            --title "Snowman $TAG" \
             --notes "For Minecraft 26.3, 26.2 and 26.1 (26.1-26.1.2) on Fabric, Forge and NeoForge: pick the jar named for your loader and Minecraft. Requires Mycel and Java 25." \
             $(find jars -name 'snowmen-*.jar' | grep -vE -- '-(sources|javadoc)\.jar$' | sort)
 

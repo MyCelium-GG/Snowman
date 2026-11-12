@@ -19,6 +19,9 @@ public abstract class InteractionMixin {
     @Inject(method = "interact", at = @At("HEAD"), cancellable = true)
     private void snowmen$interact(Player player, InteractionHand hand, Vec3 location,
             CallbackInfoReturnable<InteractionResult> cir) {
+        if (!my.celium.org.snowmen.SnowGate.on()) {
+            return;
+        }
         InteractionResult result = Snowman.interact((Interaction) (Object) this, player, hand);
         if (result != null) {
             cir.setReturnValue(result);
@@ -27,13 +30,16 @@ public abstract class InteractionMixin {
 
     @Inject(method = "skipAttackInteraction", at = @At("HEAD"), cancellable = true)
     private void snowmen$attack(Entity attacker, CallbackInfoReturnable<Boolean> cir) {
-        if (Snowman.attack((Interaction) (Object) this, attacker)) {
+        if (my.celium.org.snowmen.SnowGate.on() && Snowman.attack((Interaction) (Object) this, attacker)) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void snowmen$tick(CallbackInfo ci) {
+        if (!my.celium.org.snowmen.SnowGate.on()) {
+            return;
+        }
         Snowman.tick((Interaction) (Object) this);
     }
 }

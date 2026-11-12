@@ -1,4 +1,4 @@
-# Snowmen
+# Snowman
 
 **Build a real snowman.** Roll a snowball through the snow and watch it grow, stack three, then give it a face, arms, a scarf and a hat.
 

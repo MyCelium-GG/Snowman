@@ -24,7 +24,7 @@ import net.minecraft.world.item.component.ItemLore;
 public final class SnowmenMod {
     public static final String ID = "snowmen";
 
-    public static final ModMetadata META = ModMetadata.builder(ID, "Snowmen", "1.0.0")
+    public static final ModMetadata META = ModMetadata.builder(ID, "Snowman", "1.0.0")
             .author("MyCelium")
             .website("https://www.curseforge.com/minecraft/mc-mods/snowmen")
             .updateUrl("https://wiki.mycelium-gg.org/updates/snowmen.json")

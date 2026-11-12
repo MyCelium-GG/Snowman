@@ -19,6 +19,9 @@ public abstract class BlockBehaviourMixin {
     @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
     private void snowmen$use(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit,
             CallbackInfoReturnable<InteractionResult> cir) {
+        if (!my.celium.org.snowmen.SnowGate.on()) {
+            return;
+        }
         InteractionResult result = Snowman.useBlock(state, level, pos, player, hit);
         if (result != null) {
             cir.setReturnValue(result);

@@ -13,6 +13,16 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 @Mod(SnowmenMod.ID)
 public final class SnowmenForge {
     public SnowmenForge(@SuppressWarnings("unused") FMLJavaModLoadingContext context) {
+        if (!net.minecraftforge.fml.ModList.isLoaded("mycel")) {
+            my.celium.org.snowmen.MissingMycel.logOnce();
+            net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent.BUS.addListener(event -> {
+                if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
+                    my.celium.org.snowmen.MissingMycel.tell(player);
+                }
+            });
+            return;
+        }
+        my.celium.org.snowmen.SnowGate.open();
         SnowmenMod.init();
         if (FMLEnvironment.dist == Dist.CLIENT) {
             ClientSnowmen.register();

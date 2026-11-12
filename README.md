@@ -1,4 +1,4 @@
-# Snowmen
+# Snowman
 
 Build your own snowman. Roll a snowball through the snow until it is big enough, stack three, and decorate it.
 

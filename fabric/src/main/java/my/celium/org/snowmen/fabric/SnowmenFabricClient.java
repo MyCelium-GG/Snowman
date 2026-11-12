@@ -10,6 +10,9 @@ import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 public final class SnowmenFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        if (!net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("mycel")) {
+            return;
+        }
         KeyMappingHelper.registerKeyMapping(SnowmenClient.ROTATE_KEY);
         ClientTickEvents.END_CLIENT_TICK.register(SnowmenClient::tick);
         FabricNetworking.flushClient();

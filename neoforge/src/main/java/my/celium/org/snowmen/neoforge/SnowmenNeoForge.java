@@ -14,6 +14,17 @@ import net.neoforged.fml.loading.FMLEnvironment;
 public final class SnowmenNeoForge {
     public SnowmenNeoForge(IEventBus modBus,
             @SuppressWarnings("unused") ModContainer container) {
+        if (!net.neoforged.fml.ModList.get().isLoaded("mycel")) {
+            my.celium.org.snowmen.MissingMycel.logOnce();
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                    (net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) -> {
+                if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
+                    my.celium.org.snowmen.MissingMycel.tell(player);
+                }
+            });
+            return;
+        }
+        my.celium.org.snowmen.SnowGate.open();
         SnowmenMod.init();
         if (FMLEnvironment.getDist().isClient()) {
             ClientSnowmen.register(modBus);

@@ -28,6 +28,9 @@ public abstract class CreativeModeTabMixin {
     @Inject(method = "buildContents", at = @At("TAIL"))
     private void snowmen$addItems(CreativeModeTab.ItemDisplayParameters parameters, CallbackInfo ci) {
         Identifier id = BuiltInRegistries.CREATIVE_MODE_TAB.getKey((CreativeModeTab) (Object) this);
+        if (!my.celium.org.snowmen.SnowGate.on()) {
+            return;
+        }
         if (id == null || !id.getNamespace().equals("minecraft") || !id.getPath().equals("tools_and_utilities")) {
             return;
         }

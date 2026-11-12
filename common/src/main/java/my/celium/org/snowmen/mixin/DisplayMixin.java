@@ -12,6 +12,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class DisplayMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void snowmen$tick(CallbackInfo ci) {
+        if (!my.celium.org.snowmen.SnowGate.on()) {
+            return;
+        }
         Snowman.partTick((Display) (Object) this);
     }
 }
