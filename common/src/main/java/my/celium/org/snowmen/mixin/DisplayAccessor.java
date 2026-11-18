@@ -19,6 +19,9 @@ public interface DisplayAccessor {
     @Invoker("setPosRotInterpolationDuration")
     void snowmen$setPosRotInterpolationDuration(int ticks);
 
+    @Invoker("setBrightnessOverride")
+    void snowmen$setBrightnessOverride(net.minecraft.util.Brightness brightness);
+
     @Invoker("setShadowRadius")
     void snowmen$setShadowRadius(float radius);
 }

@@ -24,7 +24,7 @@ import net.minecraft.world.item.component.ItemLore;
 public final class SnowmenMod {
     public static final String ID = "snowmen";
 
-    public static final ModMetadata META = ModMetadata.builder(ID, "Snowman", "1.0.0")
+    public static final ModMetadata META = ModMetadata.builder(ID, "Snowman", "1.1.0")
             .author("MyCelium")
             .website("https://www.curseforge.com/minecraft/mc-mods/snowmen")
             .updateUrl("https://wiki.mycelium-gg.org/updates/snowmen.json")
@@ -39,6 +39,10 @@ public final class SnowmenMod {
     public static DeferredEntry<Item> rolledSnowball;
     public static DeferredEntry<Item> topHat;
     public static DeferredEntry<Item> scarf;
+    public static DeferredEntry<Item> santaHat;
+    public static DeferredEntry<Item> fairyLights;
+    public static ConfigValue<Boolean> lightsChase;
+    public static ConfigValue<Boolean> throwBack;
     public static PacketDefinition<RotatePacket> rotate;
 
     private SnowmenMod() {
@@ -56,6 +60,13 @@ public final class SnowmenMod {
                         .component(DataComponents.LORE, new ItemLore(List.of(
                                 Component.translatable("item.snowmen.top_hat.hint")
                                         .withStyle(st -> st.withItalic(false)).withStyle(ChatFormatting.GRAY))))));
+
+        santaHat = MycelRegistry.items(META).registerWithKey("santa_hat",
+                key -> new TopHatItem(new Item.Properties().setId(key).stacksTo(16)
+                        .component(DataComponents.LORE, hint("item.snowmen.santa_hat.hint")), "Santa Hat"));
+        fairyLights = MycelRegistry.items(META).registerWithKey("fairy_lights",
+                key -> new TopHatItem(new Item.Properties().setId(key).stacksTo(16)
+                        .component(DataComponents.LORE, hint("item.snowmen.fairy_lights.hint")), "Fairy Lights"));
 
         scarf = MycelRegistry.items(META).registerWithKey("scarf",
                 key -> new ScarfItem(new Item.Properties().setId(key).stacksTo(16)
@@ -78,7 +89,16 @@ public final class SnowmenMod {
                 "Rolling a snowball picks up the snow it rolls over and leaves a trail of bare ground.");
         rotateHint = builder.booleanValue("rotateHint", true,
                 "Show a hint above the hotbar when you stand next to a finished snowman.");
+        lightsChase = builder.booleanValue("lightsChase", true,
+                "Fairy lights on a snowman change colour one after another, like real Christmas lights.");
+        throwBack = builder.booleanValue("throwBack", true,
+                "A snowman with eyes throws a snowball back when you hit it once.");
         config = builder.build();
+    }
+
+    private static ItemLore hint(String key) {
+        return new ItemLore(List.of(Component.translatable(key)
+                .withStyle(st -> st.withItalic(false)).withStyle(ChatFormatting.GRAY)));
     }
 
     public static boolean isModEnabled() {

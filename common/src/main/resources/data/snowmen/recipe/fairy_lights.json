@@ -1,0 +1,33 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "mycel"
+      ]
+    }
+  ],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mycel"
+    }
+  ],
+  "forge:condition": {
+    "type": "forge:mod_loaded",
+    "modid": "mycel"
+  },
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS"
+  ],
+  "key": {
+    "S": "minecraft:string",
+    "G": "minecraft:glowstone_dust"
+  },
+  "result": {
+    "id": "snowmen:fairy_lights",
+    "count": 1
+  }
+}

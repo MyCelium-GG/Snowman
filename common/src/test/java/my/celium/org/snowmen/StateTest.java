@@ -60,4 +60,22 @@ class StateTest {
         assertTrue(back.complete());
         assertFalse(State.ball(3).complete());
     }
+
+    @Test
+    void smileAndLightsRoundTrip() {
+        State s = new State();
+        s.sizes = new int[] {10, 8, 6};
+        s.mouth = true;
+        s.lights = true;
+        State back = State.read(new HashSet<>(s.tags()));
+        assertTrue(back.mouth && back.lights && back.decorated());
+        assertFalse(back.fullyDressed());
+        back.eyes = true;
+        back.nose = true;
+        back.buttons = 3;
+        back.arms = 2;
+        back.scarf = "ff0000";
+        back.hat = true;
+        assertTrue(back.fullyDressed());
+    }
 }

@@ -1,6 +1,6 @@
 # Snowman
 
-**Snowman** is a Minecraft mod that lets you build real snowmen by hand. Pack a snowball from snow, roll it through the snow so it grows bigger with every block, stack three snowballs on top of each other, and decorate your snowman with coal eyes and buttons, a carrot nose, stick arms, a knitted scarf and a hat. It adds three new items: the Rolled Snowball, the craftable Top Hat and the dyeable Scarf.
+**Snowman** is a Minecraft mod that lets you build real snowmen by hand. Pack a snowball from snow, roll it through the snow so it grows bigger with every block, stack three snowballs on top of each other, and decorate your snowman with coal eyes and buttons, a carrot nose, stick arms, a knitted scarf and a hat. It adds five new items: the Rolled Snowball, the craftable Top Hat and Santa Hat, the dyeable Scarf and glowing Fairy Lights.
 
 ![A snowman with a top hat and a red scarf in falling snow](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/snowman.png)
 
@@ -10,11 +10,12 @@
 2. **Roll it:** walk into it to push it through the snow, or hit it to kick it. It grows with every block of snow it picks up and leaves a trail of grass behind. There's no size limit, so go build a giant
 3. **Stack it:** right-click a snowball to pick it up, then right-click a bigger (or same-size) one to put it on top. Three make a snowman, and you can go up to five for a really tall one
 4. **Decorate it:** right-click your finished snowman with
-   - **coal** for eyes and buttons
+   - **coal** for eyes and a smile on the head, and buttons on the body
    - a **carrot** for the nose
    - **sticks** for arms
    - a knitted **Scarf**, in any colour you dye it
-   - a **Top Hat** you can craft, and your snowman never melts
+   - **Fairy Lights** that glow at night, with colours running along the string
+   - a **Top Hat** or a **Santa Hat** you can craft, and your snowman never melts
    - **anything else** for a hat: a bucket, a pumpkin, a flower, a helmet
 
 ![A snowman wearing a carved pumpkin as its head](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/pumpkin.png)
@@ -28,11 +29,14 @@ Every snowman turns out different, because you decide how big each snowball gets
 - Press **R** next to your snowman to turn it
 - Snowy sounds for every step
 - Sneak and right-click to take decorations off again
-- Hit a snowman twice to knock it over and get everything back
-- Snowmen slowly melt in deserts and the Nether, unless they wear a Top Hat
+- Hit a snowman with eyes once and it throws a snowball back at you. Hit it twice to knock it over and get everything back
+- Seven advancements in their own Snowman tab
+- Snowmen slowly melt in deserts and the Nether, unless they wear a Top Hat or a Santa Hat
 - Top Hat recipe: black wool on top, red dye in the middle, three black wool at the bottom
+- Santa Hat recipe: white wool in the top right corner, red wool in the middle, three white wool at the bottom
+- Fairy Lights recipe: string, glowstone dust, string in a row
 - Scarf recipe: three wool in a row, one more under the right end; dye it like leather armor
-- Settings: turn melting or the snow trail off, or change how big snowballs can grow
+- Settings: turn melting, the snow trail, the running light colours or the snowball throwing off, or change how big snowballs can grow
 - Install it on the server and on every client: it adds new items
 - Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3
 - Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Without it the game still starts, and Snowman tells you in chat that Mycel is missing

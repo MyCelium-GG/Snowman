@@ -523,5 +523,30 @@
         "volume": 0.8
       }
     ]
+  },
+  "snowman.lights": {
+    "subtitle": "subtitles.snowmen.snowman.lights",
+    "sounds": [
+      {
+        "name": "minecraft:block/amethyst/shimmer",
+        "pitch": 1.6,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:block/amethyst_cluster/place1",
+        "pitch": 1.4,
+        "volume": 0.6
+      }
+    ]
+  },
+  "snowman.throw": {
+    "subtitle": "subtitles.snowmen.snowman.throw",
+    "sounds": [
+      {
+        "name": "minecraft:random/bow",
+        "pitch": 0.8,
+        "volume": 0.6
+      }
+    ]
   }
 }

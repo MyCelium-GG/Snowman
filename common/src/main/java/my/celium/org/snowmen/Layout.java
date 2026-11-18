@@ -14,7 +14,7 @@ import org.joml.Quaternionf;
  */
 public final class Layout {
     /** What a display shows. */
-    public enum Kind { BALL, EYE, NOSE, BUTTON, ARM, SCARF, HAT }
+    public enum Kind { BALL, EYE, NOSE, BUTTON, ARM, SCARF, HAT, MOUTH, LIGHT, WIRE }
 
     /** One display: its kind, its transformation and whether it shows a block (true) or an item. */
     public record Piece(Kind kind, int index, Matrix4f matrix, boolean block) {
@@ -22,6 +22,11 @@ public final class Layout {
 
     /** How much of a ball's width the rounding boxes keep. */
     static final float ROUND = 0.74f;
+    /** Fairy lights: blocks between two bulbs, and the most rings and bulbs per ring. */
+    static final float BULB_SPACING = 0.2f;
+    static final int MAX_RINGS = 3;
+    static final int MIN_BULBS = 8;
+    static final int MAX_BULBS = 24;
 
     private Layout() {
     }
@@ -100,6 +105,20 @@ public final class Layout {
                         cube(new Matrix4f(frame).translate(x, ey, frontZ(headR, ey - headY) + e * 0.15f), e, e, e), true));
             }
         }
+        if (s.mouth) {
+            // A smile of five coal pebbles under the nose, its ends curving up.
+            float e = Math.max(0.045f, headW * 0.075f);
+            for (int k = 0; k < 5; k++) {
+                int off = k - 2;
+                float x = off * headW * 0.095f;
+                float my = headY - headW * 0.21f + off * off * headW * 0.022f;
+                out.add(new Piece(Kind.MOUTH, k,
+                        cube(new Matrix4f(frame).translate(x, my, frontZ(headR, my - headY) + e * 0.1f), e, e, e), true));
+            }
+        }
+        if (s.lights) {
+            lights(out, frame, sizes, head);
+        }
         if (s.nose) {
             float t = Math.max(0.05f, headW * 0.1f);
             float len = Math.max(0.16f, headW * 0.42f);
@@ -138,6 +157,75 @@ public final class Layout {
             out.add(new Piece(Kind.HAT, 0, m, false));
         }
         return out;
+    }
+
+    /**
+     * Fairy lights: a tilted ring of bulbs around each ball below the head (the top three at
+     * most), every ring leaning the other way, like a string wound down the snowman.
+     */
+    private static void lights(List<Piece> out, Matrix4f frame, int[] sizes, int head) {
+        int index = 0;
+        int wires = 0;
+        int lowest = Math.max(0, head - MAX_RINGS);
+        for (int i = head - 1; i >= lowest; i--) {
+            float w = Ball.scale(sizes[i]);
+            float r = w / 2;
+            float cy = Ball.centre(sizes, i);
+            int n = bulbs(w);
+            float bulb = Math.max(0.085f, Math.min(0.17f, w * 0.085f));
+            float wire = Math.max(0.02f, bulb * 0.22f);
+            float tilt = (i % 2 == 0 ? 1 : -1) * r * 0.32f;
+            org.joml.Vector3f[] at = new org.joml.Vector3f[n];
+            for (int k = 0; k < n; k++) {
+                double angle = 2 * Math.PI * k / n;
+                float c = (float) Math.cos(angle);
+                float z = (float) Math.sin(angle);
+                float dy = tilt * c;
+                float d = surface(r, c, z, dy) + bulb * 0.15f;
+                at[k] = new org.joml.Vector3f(c * d, cy + dy, z * d);
+                Matrix4f m = new Matrix4f(frame).translate(at[k]).rotateY((float) -angle);
+                out.add(new Piece(Kind.LIGHT, index++, cube(m, bulb, bulb, bulb), true));
+            }
+            // A thin dark wire from each bulb to the next, so the bulbs read as one string.
+            for (int k = 0; k < n; k++) {
+                org.joml.Vector3f a = at[k];
+                org.joml.Vector3f b = at[(k + 1) % n];
+                org.joml.Vector3f dir = new org.joml.Vector3f(b).sub(a);
+                float len = dir.length();
+                if (len < 1e-4f) {
+                    continue;
+                }
+                Matrix4f m = new Matrix4f(frame).translate(new org.joml.Vector3f(a).add(b).mul(0.5f))
+                        .rotate(new Quaternionf().rotationTo(1, 0, 0, dir.x / len, dir.y / len, dir.z / len));
+                out.add(new Piece(Kind.WIRE, wires++, cube(m, len, wire, wire), true));
+            }
+        }
+    }
+
+    /** How many bulbs go around a ball this wide. */
+    static int bulbs(float width) {
+        int n = Math.round((float) (Math.PI * width / BULB_SPACING));
+        return Math.max(MIN_BULBS, Math.min(MAX_BULBS, n));
+    }
+
+    /**
+     * Distance from a ball's centre to its outside, going in the horizontal direction
+     * ({@code x}, {@code z}) at {@code dy} above the centre. The ball is three crossed boxes,
+     * so this is the farthest exit through any box that reaches that height.
+     */
+    static float surface(float r, float x, float z, float dy) {
+        float flat = r * ROUND;
+        float[][] half = {{r, flat, flat}, {flat, r, flat}, {flat, flat, r}};
+        float best = 0;
+        for (float[] h : half) {
+            if (Math.abs(dy) > h[1]) {
+                continue;
+            }
+            float tx = Math.abs(x) < 1e-6f ? Float.MAX_VALUE : h[0] / Math.abs(x);
+            float tz = Math.abs(z) < 1e-6f ? Float.MAX_VALUE : h[2] / Math.abs(z);
+            best = Math.max(best, Math.min(tx, tz));
+        }
+        return best == 0 ? flat : best;
     }
 
     /** Height of the centre of a ball of width {@code w}, turned by {@code roll}, resting on the ground. */

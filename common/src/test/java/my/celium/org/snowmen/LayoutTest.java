@@ -79,4 +79,67 @@ class LayoutTest {
         assertTrue(eyeY > Ball.centre(s.sizes, 3) && eyeY < Ball.height(s.sizes), "eyes on the top ball: " + eyeY);
         assertTrue(Math.abs(buttonY - Ball.centre(s.sizes, 3)) < Ball.scale(7) / 2, "buttons on the ball below: " + buttonY);
     }
+
+    @Test
+    void aSmileIsFivePebblesUnderTheNose() {
+        State s = new State();
+        s.sizes = new int[] {14, 9, 5};
+        s.mouth = true;
+        s.nose = true;
+        List<Layout.Piece> pieces = Layout.pieces(s, 0, 0, null);
+        assertEquals(5, count(pieces, Layout.Kind.MOUTH));
+        Vector3f nose = pieces.stream().filter(p -> p.kind() == Layout.Kind.NOSE).findFirst().orElseThrow()
+                .matrix().transformPosition(new Vector3f(0.5f, 0.5f, 0.5f));
+        for (Layout.Piece p : pieces) {
+            if (p.kind() == Layout.Kind.MOUTH) {
+                Vector3f at = p.matrix().transformPosition(new Vector3f(0.5f, 0.5f, 0.5f));
+                assertTrue(at.y < nose.y, "the smile is below the nose");
+            }
+        }
+    }
+
+    @Test
+    void fairyLightsSitOutsideTheSnow() {
+        State s = new State();
+        s.sizes = new int[] {14, 9, 5};
+        s.lights = true;
+        List<Layout.Piece> pieces = Layout.pieces(s, 0, 30, null);
+        long bulbs = count(pieces, Layout.Kind.LIGHT);
+        assertEquals(bulbs, count(pieces, Layout.Kind.WIRE), "one wire from every bulb to the next");
+        assertEquals(Layout.bulbs(Ball.scale(14)) + Layout.bulbs(Ball.scale(9)), bulbs);
+        for (Layout.Piece p : pieces) {
+            if (p.kind() != Layout.Kind.LIGHT) {
+                continue;
+            }
+            Vector3f at = p.matrix().transformPosition(new Vector3f(0.5f, 0.5f, 0.5f));
+            float dist = (float) Math.hypot(at.x, at.z);
+            assertTrue(dist >= Ball.scale(9) / 2 * Layout.ROUND, "a bulb is never inside a ball: " + dist);
+        }
+    }
+
+    @Test
+    void fairyLightsWindAroundThreeBallsAtMost() {
+        State s = new State();
+        s.sizes = new int[] {16, 14, 12, 10, 8, 6};
+        s.lights = true;
+        long bulbs = count(Layout.pieces(s, 0, 0, null), Layout.Kind.LIGHT);
+        assertEquals(Layout.bulbs(Ball.scale(12)) + Layout.bulbs(Ball.scale(10)) + Layout.bulbs(Ball.scale(8)), bulbs);
+    }
+
+    @Test
+    void surfaceIsTheOutsideOfTheCrossedBoxes() {
+        float r = 1;
+        assertEquals(r, Layout.surface(r, 1, 0, 0), 1e-5);
+        assertEquals(r, Layout.surface(r, 0, 1, 0), 1e-5);
+        float diag = (float) Math.sqrt(0.5);
+        assertTrue(Layout.surface(r, diag, diag, 0) > r, "the diagonal reaches past the radius");
+        assertEquals(r * Layout.ROUND, Layout.surface(r, 1, 0, 0.9f), 1e-5);
+    }
+
+    @Test
+    void biggerBallsGetMoreBulbs() {
+        assertEquals(Layout.MIN_BULBS, Layout.bulbs(0.3f));
+        assertTrue(Layout.bulbs(1.2f) > Layout.bulbs(0.6f));
+        assertEquals(Layout.MAX_BULBS, Layout.bulbs(20));
+    }
 }

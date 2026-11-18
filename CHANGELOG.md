@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.0] - 2026-11-18
+
+### Added
+- Fairy Lights: wind a string of lights around a snowman. They glow in the dark and the colours run along the string. Recipe: string, glowstone dust, string.
+- Santa Hat: craft it from red and white wool. Like the Top Hat, it keeps a snowman from melting.
+- A coal smile. Coal goes where you aim: eyes and then a smile on the head, buttons on the body.
+- Hit a snowman with eyes once and it turns around and throws a snowball back at you.
+- Seven advancements in their own Snowman tab, from packing your first snowball to a fully dressed snowman.
+- Settings to turn off the running light colours and the snowball throwing.
+
 ## [1.0.0] - 2026-11-12
 
 ### Added

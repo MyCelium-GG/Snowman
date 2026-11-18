@@ -25,12 +25,15 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Brightness;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -78,6 +81,17 @@ public final class Snowman {
     /** Snowballs dropped when a giant snowman falls apart, at most. */
     private static final int MAX_SNOW_DROPS = 64;
 
+    /** How often fairy lights move on to the next colour, in ticks. */
+    private static final int LIGHT_TICKS = 10;
+    /** Fairy light colours, in the order they run along the string. */
+    private static final DyeColor[] LIGHT_COLORS = {
+        DyeColor.RED, DyeColor.YELLOW, DyeColor.LIME, DyeColor.LIGHT_BLUE, DyeColor.MAGENTA
+    };
+    /** A snowman throws back at players up to this far away. */
+    private static final double THROW_RANGE = 24;
+    /** Snowball size that earns the big snowball advancement. */
+    private static final int BIG_BALL = 16;
+
     private static final Map<Interaction, Motion> MOTION = new WeakHashMap<>();
     private static final Map<Interaction, Quaternionf> SPIN = new WeakHashMap<>();
     private static final Map<Interaction, Long> LAST_HIT = new WeakHashMap<>();
@@ -85,6 +99,15 @@ public final class Snowman {
     private static final Map<Interaction, List<Display>> PARTS = new WeakHashMap<>();
     /** A hat waiting for the next rebuild, because the display that holds it is created there. */
     private static final Map<Interaction, ItemStack> NEW_HAT = new WeakHashMap<>();
+    private static final Map<Interaction, Throw> THROWS = new WeakHashMap<>();
+
+    /** A snowman that was hit and is about to throw a snowball back. */
+    private static final class Throw {
+        UUID target;
+        int ticks;
+        /** How far it turned to face the player, in degrees; it turns back afterwards. */
+        float turn;
+    }
 
     private Snowman() {
     }
@@ -123,6 +146,12 @@ public final class Snowman {
             return out;
         }
         out.add(new ItemStack(SnowmenMod.topHat.get()));
+        if (SnowmenMod.santaHat != null) {
+            out.add(new ItemStack(SnowmenMod.santaHat.get()));
+        }
+        if (SnowmenMod.fairyLights != null) {
+            out.add(new ItemStack(SnowmenMod.fairyLights.get()));
+        }
         if (SnowmenMod.scarf != null) {
             out.add(new ItemStack(SnowmenMod.scarf.get()));
         }
@@ -208,6 +237,7 @@ public final class Snowman {
         }
         spawn(server, Vec3.atBottomCenterOf(at), State.ball(Ball.MIN_SIZE), 0);
         sound(server, Vec3.atCenterOf(at), "ball.pack", 1.0f);
+        Advance.award(player, Advance.ROOT);
         return InteractionResult.SUCCESS;
     }
 
@@ -270,6 +300,12 @@ public final class Snowman {
             LAST_HIT.put(root, now);
             wobble(root, s);
             sound(server, root.position().add(0, 0.5, 0), "snowman.hit", 1.0f);
+            if (s.complete() && s.eyes && (SnowmenMod.throwBack == null || SnowmenMod.throwBack.get())
+                    && !THROWS.containsKey(root)) {
+                Throw t = new Throw();
+                t.target = player.getUUID();
+                THROWS.put(root, t);
+            }
         }
         return true;
     }
@@ -282,6 +318,8 @@ public final class Snowman {
         double vz;
         double sinceSound;
         BlockPos lastCell;
+        /** The player who last pushed or kicked it, for the big snowball advancement. */
+        UUID roller;
         /** Blocks whose snow this ball picked up recently, oldest first. */
         final java.util.LinkedHashSet<Long> picked = new java.util.LinkedHashSet<>();
     }
@@ -302,6 +340,7 @@ public final class Snowman {
         }
         double speed = Roll.kick(s.top());
         Motion m = MOTION.computeIfAbsent(root, r -> new Motion());
+        m.roller = player.getUUID();
         m.vx += dx / len * speed;
         m.vz += dz / len * speed;
         double v = Math.hypot(m.vx, m.vz);
@@ -337,6 +376,7 @@ public final class Snowman {
             double want = toward * Roll.pushFactor(s.top()) + Math.max(0, reach - d) * Roll.CATCH_UP;
             Motion m = MOTION.computeIfAbsent(root, k -> new Motion());
             double along = (m.vx * dx + m.vz * dz) / d;
+            m.roller = p.getUUID();
             if (along < want) {
                 m.vx += dx / d * (want - along);
                 m.vz += dz / d * (want - along);
@@ -400,6 +440,9 @@ public final class Snowman {
             writeState(root, s);
             resize(root, s);
             sound(level, pos, "ball.grow", Math.max(0.5f, 1.4f - size * 0.02f));
+            if (size >= BIG_BALL && m.roller != null) {
+                Advance.award(level.getPlayerByUUID(m.roller), "big_snowball");
+            }
         }
         root.snapTo(pos);
         for (Display part : parts(root)) {
@@ -572,6 +615,10 @@ public final class Snowman {
             sound(level, top, "snowman.complete", 1.0f);
             sound(level, top, "snowman.complete", 1.5f);
             sound(level, top, "snowman.sparkle", 1.0f);
+            Advance.award(player, "snowman");
+        }
+        if (s.sizes.length >= 5) {
+            Advance.award(player, "tall_snowman");
         }
         return InteractionResult.SUCCESS;
     }
@@ -582,6 +629,9 @@ public final class Snowman {
         if (s.hat) {
             back = hatOf(root);
             s.hat = false;
+        } else if (s.lights) {
+            s.lights = false;
+            back = new ItemStack(SnowmenMod.fairyLights.get());
         } else if (s.scarf != null) {
             back = scarfItem(scarfColor(s.scarf));
             s.scarf = null;
@@ -593,6 +643,9 @@ public final class Snowman {
             back = new ItemStack(Items.CARROT);
         } else if (s.buttons > 0) {
             s.buttons--;
+            back = new ItemStack(Items.COAL);
+        } else if (s.mouth) {
+            s.mouth = false;
             back = new ItemStack(Items.COAL);
         } else if (s.eyes) {
             s.eyes = false;
@@ -621,13 +674,26 @@ public final class Snowman {
         ItemStack back = ItemStack.EMPTY;
         String sound = "snowman.decorate";
         if (item.is(Items.COAL) || item.is(Items.CHARCOAL)) {
-            if (!s.eyes) {
-                s.eyes = true;
+            // Coal goes where you aim: eyes and then a smile on the head, buttons on the body.
+            boolean onHead = aimedBall(root, s, player) == s.sizes.length - 1;
+            boolean face = !s.eyes || !s.mouth;
+            if (onHead ? face : s.buttons >= 3 && face) {
+                if (!s.eyes) {
+                    s.eyes = true;
+                } else {
+                    s.mouth = true;
+                }
             } else if (s.buttons < 3) {
                 s.buttons++;
             } else {
                 return InteractionResult.PASS;
             }
+        } else if (isLights(item)) {
+            if (s.lights) {
+                return InteractionResult.PASS;
+            }
+            s.lights = true;
+            sound = "snowman.lights";
         } else if (item.is(Items.CARROT) && !s.nose) {
             s.nose = true;
         } else if (item.is(Items.STICK) && s.arms < 2) {
@@ -640,7 +706,7 @@ public final class Snowman {
             s.scarf = String.format("%06x", DyedItemColor.getOrDefault(item, ScarfItem.DEFAULT_COLOR) & 0xFFFFFF);
             sound = "snowman.scarf";
         } else if (item.is(Items.COAL) || item.is(Items.CHARCOAL) || item.is(Items.CARROT) || item.is(Items.STICK)
-                || item.is(Items.SNOWBALL) || isScarf(item)) {
+                || item.is(Items.SNOWBALL) || isScarf(item) || isLights(item)) {
             return InteractionResult.PASS;
         } else {
             if (s.hat) {
@@ -657,6 +723,12 @@ public final class Snowman {
         rebuild(level, root);
         give(player, back);
         sound(level, root.position().add(0, Ball.height(s.sizes), 0), sound, 1.0f);
+        if (s.lights) {
+            Advance.award(player, "fairy_lights");
+        }
+        if (s.fullyDressed()) {
+            Advance.award(player, "dressed");
+        }
         return InteractionResult.SUCCESS;
     }
 
@@ -671,6 +743,14 @@ public final class Snowman {
             push(level, root, now);
             step(level, root, now);
         }
+        if (now.lights && root.tickCount % LIGHT_TICKS == 0
+                && (SnowmenMod.lightsChase == null || SnowmenMod.lightsChase.get())) {
+            chase(root, root.tickCount / LIGHT_TICKS);
+        }
+        Throw toss = THROWS.get(root);
+        if (toss != null) {
+            throwTick(level, root, toss);
+        }
         int[] wobble = WOBBLE.get(root);
         if (wobble != null && --wobble[0] <= 0) {
             WOBBLE.remove(root);
@@ -678,7 +758,7 @@ public final class Snowman {
         }
         if (root.tickCount % MELT_TICKS == 0 && root.tickCount > 0
                 && (SnowmenMod.melting == null || SnowmenMod.melting.get()) && melts(level, root)
-                && !isTopHat(hatOf(root))) {
+                && !isModHat(hatOf(root))) {
             melt(level, root);
         }
         if (root.tickCount % HINT_TICKS == 0 && (SnowmenMod.rotateHint == null || SnowmenMod.rotateHint.get())) {
@@ -733,8 +813,111 @@ public final class Snowman {
         sound(level, best.position().add(0, 1, 0), "snowman.rotate", 1.0f);
     }
 
-    private static boolean isTopHat(ItemStack stack) {
-        return SnowmenMod.topHat != null && !stack.isEmpty() && stack.is(SnowmenMod.topHat.get());
+    /** The mod's own hats (Top Hat, Santa Hat) sit flat on the head and keep a snowman from melting. */
+    private static boolean isModHat(ItemStack stack) {
+        return !stack.isEmpty() && (SnowmenMod.topHat != null && stack.is(SnowmenMod.topHat.get())
+                || SnowmenMod.santaHat != null && stack.is(SnowmenMod.santaHat.get()));
+    }
+
+    private static boolean isLights(ItemStack stack) {
+        return SnowmenMod.fairyLights != null && !stack.isEmpty() && stack.is(SnowmenMod.fairyLights.get());
+    }
+
+    /**
+     * Which ball of the stack the player is looking at: the nearest one the look ray passes
+     * through, or the head when the ray misses them all.
+     */
+    private static int aimedBall(Interaction root, State s, Player player) {
+        Vec3 eye = player.getEyePosition();
+        Vec3 look = player.getLookAngle();
+        int best = s.sizes.length - 1;
+        double bestT = Double.MAX_VALUE;
+        for (int i = 0; i < s.sizes.length; i++) {
+            double r = Ball.scale(s.sizes[i]) / 2;
+            Vec3 to = root.position().add(0, Ball.centre(s.sizes, i), 0).subtract(eye);
+            double along = to.dot(look);
+            double miss = to.lengthSqr() - along * along;
+            if (along > 0 && miss <= r * r) {
+                double t = along - Math.sqrt(r * r - miss);
+                if (t < bestT) {
+                    bestT = t;
+                    best = i;
+                }
+            }
+        }
+        return best;
+    }
+
+    /** Fairy lights move on one colour, so the colours seem to run along the string. */
+    private static void chase(Interaction root, int phase) {
+        String prefix = State.PART + ".light.";
+        for (Display part : parts(root)) {
+            if (!(part instanceof Display.BlockDisplay block)) {
+                continue;
+            }
+            for (String tag : part.entityTags()) {
+                if (tag.startsWith(prefix)) {
+                    try {
+                        int index = Integer.parseInt(tag.substring(prefix.length()));
+                        ((BlockDisplayAccessor) block).snowmen$setBlockState(lightBlock(index + phase));
+                    } catch (NumberFormatException ignored) {
+                        // Not a bulb of ours.
+                    }
+                }
+            }
+        }
+    }
+
+    private static BlockState lightBlock(int index) {
+        return Compat.concrete(LIGHT_COLORS[Math.floorMod(index, LIGHT_COLORS.length)]).defaultBlockState();
+    }
+
+    /**
+     * A hit snowman turns to the player, throws a snowball at them and turns back. Ticks after
+     * the hit: 6 turn, 11 throw, 30 turn back.
+     */
+    private static void throwTick(ServerLevel level, Interaction root, Throw t) {
+        t.ticks++;
+        State s = State.read(root.entityTags());
+        Player target = level.getPlayerByUUID(t.target);
+        if (target == null || target.isSpectator() || !target.isAlive() || !s.complete()
+                || target.distanceToSqr(root) > THROW_RANGE * THROW_RANGE) {
+            if (t.turn != 0) {
+                layout(root, s, 6, 0);
+            }
+            THROWS.remove(root);
+            return;
+        }
+        if (t.ticks == 6) {
+            double dx = target.getX() - root.getX();
+            double dz = target.getZ() - root.getZ();
+            float want = (float) Math.toDegrees(Math.atan2(-dx, dz));
+            t.turn = Mth.wrapDegrees(want - root.getYRot());
+            layout(root, s, 4, t.turn);
+        } else if (t.ticks == 11) {
+            throwAt(level, root, s, target, t.turn);
+        } else if (t.ticks >= 30) {
+            layout(root, s, 8, 0);
+            THROWS.remove(root);
+        }
+    }
+
+    private static void throwAt(ServerLevel level, Interaction root, State s, Player target, float turn) {
+        double yaw = Math.toRadians(root.getYRot() + turn);
+        double fx = -Math.sin(yaw);
+        double fz = Math.cos(yaw);
+        int head = s.sizes.length - 1;
+        // From in front of the head, outside the snowman's own hitbox so it does not hit itself.
+        double out = Ball.widest(s.sizes) * 0.75 + 0.3;
+        Vec3 from = root.position().add(fx * out, Ball.centre(s.sizes, head), fz * out);
+        Snowball ball = new Snowball(level, from.x, from.y, from.z, new ItemStack(Items.SNOWBALL));
+        double dx = target.getX() - from.x;
+        double dy = target.getEyeY() - 1.1 - from.y;
+        double dz = target.getZ() - from.z;
+        ball.shoot(dx, dy + Math.hypot(dx, dz) * 0.2, dz, 1.4f, 4f);
+        level.addFreshEntity(ball);
+        sound(level, from, "snowman.throw", 1.0f);
+        Advance.award(target, "snowball_fight");
     }
 
     /** Displays whose snowman is gone (killed by a command, say) clean themselves up. */
@@ -836,7 +1019,7 @@ public final class Snowman {
             hat = hatOf(root);
         }
         s.hatBlock = hat.getItem() instanceof BlockItem;
-        s.hatTop = isTopHat(hat);
+        s.hatTop = isModHat(hat);
         for (Display part : parts(root)) {
             part.discard();
         }
@@ -846,7 +1029,8 @@ public final class Snowman {
             Display display;
             if (piece.block()) {
                 Display.BlockDisplay block = new Display.BlockDisplay(Compat.blockDisplay(), level);
-                ((BlockDisplayAccessor) block).snowmen$setBlockState(blockFor(piece.kind(), s));
+                ((BlockDisplayAccessor) block).snowmen$setBlockState(piece.kind() == Layout.Kind.LIGHT
+                        ? lightBlock(piece.index() + root.tickCount / LIGHT_TICKS) : blockFor(piece.kind(), s));
                 display = block;
             } else {
                 Display.ItemDisplay item = new Display.ItemDisplay(Compat.itemDisplay(), level);
@@ -870,6 +1054,10 @@ public final class Snowman {
             if (piece.kind() == Layout.Kind.BALL && piece.index() == 0) {
                 d.snowmen$setShadowRadius(Ball.scale(s.sizes[0]) * 0.45f);
             }
+            if (piece.kind() == Layout.Kind.LIGHT) {
+                // Bulbs glow in the dark.
+                d.snowmen$setBrightnessOverride(Brightness.FULL_BRIGHT);
+            }
             level.addFreshEntity(display);
             made.add(display);
         }
@@ -888,7 +1076,7 @@ public final class Snowman {
         }
         ItemStack hat = hatOf(root);
         s.hatBlock = hat.getItem() instanceof BlockItem;
-        s.hatTop = isTopHat(hat);
+        s.hatTop = isModHat(hat);
         for (Layout.Piece piece : Layout.pieces(s, 0, root.getYRot() + extraYaw, SPIN.get(root))) {
             Display display = byTag.get(partTag(piece));
             if (display != null) {
@@ -915,7 +1103,8 @@ public final class Snowman {
 
     private static BlockState blockFor(Layout.Kind kind, State s) {
         return switch (kind) {
-            case EYE, BUTTON -> Blocks.COAL_BLOCK.defaultBlockState();
+            case EYE, BUTTON, MOUTH -> Blocks.COAL_BLOCK.defaultBlockState();
+            case WIRE -> Compat.concrete(DyeColor.GREEN).defaultBlockState();
             case NOSE -> Compat.orangeConcrete().defaultBlockState();
             default -> Blocks.SNOW_BLOCK.defaultBlockState();
         };
@@ -952,6 +1141,12 @@ public final class Snowman {
         if (s.buttons > 0) {
             drops.add(new ItemStack(Items.COAL, s.buttons));
         }
+        if (s.mouth) {
+            drops.add(new ItemStack(Items.COAL));
+        }
+        if (s.lights && SnowmenMod.fairyLights != null) {
+            drops.add(new ItemStack(SnowmenMod.fairyLights.get()));
+        }
         if (s.nose) {
             drops.add(new ItemStack(Items.CARROT));
         }
@@ -983,6 +1178,7 @@ public final class Snowman {
         PARTS.remove(root);
         MOTION.remove(root);
         SPIN.remove(root);
+        THROWS.remove(root);
         root.discard();
     }
 

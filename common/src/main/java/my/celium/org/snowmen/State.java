@@ -19,6 +19,10 @@ public final class State {
     public int[] sizes = new int[0];
     public boolean eyes;
     public boolean nose;
+    /** A coal smile under the nose. */
+    public boolean mouth;
+    /** Fairy lights wound around the snowman. */
+    public boolean lights;
     public int buttons;
     public int arms;
     /** Dye colour name of the scarf, or null. */
@@ -42,7 +46,12 @@ public final class State {
     }
 
     public boolean decorated() {
-        return eyes || nose || buttons > 0 || arms > 0 || scarf != null || hat;
+        return eyes || mouth || lights || nose || buttons > 0 || arms > 0 || scarf != null || hat;
+    }
+
+    /** Every decoration on: eyes, smile, nose, three buttons, two arms, scarf and hat. */
+    public boolean fullyDressed() {
+        return eyes && mouth && nose && buttons == 3 && arms == 2 && scarf != null && hat;
     }
 
     public int top() {
@@ -68,6 +77,8 @@ public final class State {
             switch (key) {
                 case "eyes" -> s.eyes = true;
                 case "nose" -> s.nose = true;
+                case "mouth" -> s.mouth = true;
+                case "lights" -> s.lights = true;
                 case "hat" -> s.hat = true;
                 case "buttons" -> s.buttons = Math.max(0, Math.min(3, parse(value, 0)));
                 case "arms" -> s.arms = Math.max(0, Math.min(2, parse(value, 0)));
@@ -95,6 +106,12 @@ public final class State {
         }
         if (nose) {
             out.add(PREFIX + "nose");
+        }
+        if (mouth) {
+            out.add(PREFIX + "mouth");
+        }
+        if (lights) {
+            out.add(PREFIX + "lights");
         }
         if (hat) {
             out.add(PREFIX + "hat");

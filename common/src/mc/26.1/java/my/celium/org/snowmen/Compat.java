@@ -34,6 +34,27 @@ final class Compat {
         return Blocks.ORANGE_CONCRETE;
     }
 
+    static Block concrete(DyeColor color) {
+        return switch (color) {
+            case WHITE -> Blocks.WHITE_CONCRETE;
+            case ORANGE -> Blocks.ORANGE_CONCRETE;
+            case MAGENTA -> Blocks.MAGENTA_CONCRETE;
+            case LIGHT_BLUE -> Blocks.LIGHT_BLUE_CONCRETE;
+            case YELLOW -> Blocks.YELLOW_CONCRETE;
+            case LIME -> Blocks.LIME_CONCRETE;
+            case PINK -> Blocks.PINK_CONCRETE;
+            case GRAY -> Blocks.GRAY_CONCRETE;
+            case LIGHT_GRAY -> Blocks.LIGHT_GRAY_CONCRETE;
+            case CYAN -> Blocks.CYAN_CONCRETE;
+            case PURPLE -> Blocks.PURPLE_CONCRETE;
+            case BLUE -> Blocks.BLUE_CONCRETE;
+            case BROWN -> Blocks.BROWN_CONCRETE;
+            case GREEN -> Blocks.GREEN_CONCRETE;
+            case RED -> Blocks.RED_CONCRETE;
+            case BLACK -> Blocks.BLACK_CONCRETE;
+        };
+    }
+
     static Block wool(DyeColor color) {
         return switch (color) {
             case WHITE -> Blocks.WHITE_WOOL;

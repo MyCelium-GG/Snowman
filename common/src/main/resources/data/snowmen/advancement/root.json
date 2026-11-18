@@ -1,0 +1,53 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "mycel"
+      ]
+    }
+  ],
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "mycel"
+    }
+  ],
+  "forge:condition": {
+    "type": "forge:mod_loaded",
+    "modid": "mycel"
+  },
+  "display": {
+    "icon": {
+      "id": "snowmen:rolled_snowball",
+      "components": {
+        "minecraft:custom_model_data": {
+          "floats": [
+            6.0
+          ]
+        }
+      }
+    },
+    "title": {
+      "translate": "advancements.snowmen.root.title"
+    },
+    "description": {
+      "translate": "advancements.snowmen.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "minecraft:block/snow"
+  },
+  "criteria": {
+    "done": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "done"
+    ]
+  ]
+}

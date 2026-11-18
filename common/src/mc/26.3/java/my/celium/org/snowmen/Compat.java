@@ -34,6 +34,10 @@ final class Compat {
         return Blocks.CONCRETE.pick(DyeColor.ORANGE);
     }
 
+    static Block concrete(DyeColor color) {
+        return Blocks.CONCRETE.pick(color);
+    }
+
     static Block wool(DyeColor color) {
         return Blocks.WOOL.pick(color);
     }
