@@ -40,3 +40,4 @@ Every snowman turns out different, because you decide how big each snowball gets
 - Install it on the server and on every client: it adds new items
 - Fabric, Forge and NeoForge, Minecraft 26.1 to 26.3
 - Requires [Mycel](https://www.curseforge.com/minecraft/mc-mods/mycel). Without it the game still starts, and Snowman tells you in chat that Mycel is missing
+- In 11 languages: English, German, Spanish, French, Dutch, Brazilian Portuguese, Russian, Polish, Italian, Japanese and Simplified Chinese

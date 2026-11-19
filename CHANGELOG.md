@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0] - 2026-11-19
+
+### Added
+- Dutch, Polish, Italian and Japanese, so it is now in 11 languages. The "Mycel is missing" message is translated too.
+
+### Changed
+- Needs Mycel 1.7.0.
+
 ## [1.1.0] - 2026-11-19
 
 ### Added
