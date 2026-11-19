@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/header.svg" alt="Snowman" width="100%">
+  <img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/header.svg" alt="Snowman" width="100%">
 </p>
 
 <p align="center">
@@ -15,36 +15,36 @@
 
 <a href="https://www.curseforge.com/minecraft/mc-mods/mycel"><img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/mycel-required.svg" alt="Mycel is required: this mod needs the Mycel library to run. Install Mycel next to it, for the same Minecraft version and loader. Download it from CurseForge." width="100%"></a>
 
-![About the mod](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/about-the-mod.svg)
+![About the mod](https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/about-the-mod.svg)
 
-<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/about.svg" alt="Snowman Roll a snowball through the snow until it is big enough, stack three, and decorate it. Every snowman turns out different, because you decide how big each snowball gets." width="100%">
+<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/about.svg" alt="Snowman Roll a snowball through the snow until it is big enough, stack three, and decorate it. Every snowman turns out different, because you decide how big each snowball gets." width="100%">
 
 ![A snowman with a top hat and a red scarf in falling snow](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/snowman.png)
 
-![How it works](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/how-it-works.svg)
+![How it works](https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/how-it-works.svg)
 
-<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/how-it-works-box.svg" alt="Pack a snowball: Right-click snow with an empty hand. Roll it: Walk into it to push it, or hit it to kick it away. It rolls smoothly in any direction, slides along walls and rolls down drops, but never uphill. Every block of snow it rolls over adds one size, with no size limit, and leaves bare ground behind. Pick it up: Right-click a snowball with an empty hand. It becomes a Rolled Snowball item t" width="100%">
+<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/how-it-works-box.svg" alt="Pack a snowball: Right-click snow with an empty hand. Roll it: Walk into it to push it, or hit it to kick it away. It rolls smoothly in any direction, slides along walls and rolls down drops, but never uphill. Every block of snow it rolls over adds one size, with no size limit, and leaves bare ground behind. Pick it up: Right-click a snowball with an empty hand. It becomes a Rolled Snowball item t" width="100%">
 
 ![Snowballs rolled through snow, each leaving a trail of grass](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/rolling.png)
 
-![Decorating](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/decorating.svg)
+![Decorating](https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/decorating.svg)
 
-<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/decorating-box.svg" alt="Coal or charcoal: Eyes first, then up to three buttons. A carrot: The nose. Sticks: Up to two arms. A Scarf: Knitted, with a hanging end. Dye it any colour, like leather armor. A Top Hat: A snowman wearing one never melts. Anything else: A hat. Blocks like a carved pumpkin go over the head, items like a bucket sit on top. Take things off: Sneak and right-click with an empty hand. Hit a snowman twi" width="100%">
+<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/decorating-box.svg" alt="Coal or charcoal: Goes where you aim. On the head: eyes first, then a smile. On the body: up to three buttons. A carrot: The nose. Sticks: Up to two arms. Fairy Lights: A string of coloured bulbs wound around the snowman. They glow in the dark and the colours run along the string. A Scarf: Knitted, with a hanging end. Dye it any colour, like leather armor. A Top Hat or a Santa Hat: A snowman weari" width="100%">
 
 ![A snowman wearing a carved pumpkin as its head](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/pumpkin.png)
 
-![Recipes](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/recipes.svg)
+![Recipes](https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/recipes.svg)
 
-<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/recipes-box.svg" alt="Scarf: Three wool in a row and one more under the right end. Craft it with any dye to colour it. Top Hat: Black wool on top, red dye in the middle, three black wool at the bottom." width="100%">
+<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/recipes-box.svg" alt="Fairy Lights: String, glowstone dust and string in a row. Santa Hat: White wool in the top right corner, red wool in the middle, three white wool at the bottom. Top Hat: Black wool on top, red dye in the middle, three black wool at the bottom. Scarf: Three wool in a row and one more under the right end. Craft it with any dye to colour it." width="100%">
 
 ![Rolled Snowballs of different sizes and a Top Hat in the inventory](https://raw.githubusercontent.com/MyCelium-GG/Snowman/2f55400c9300/docs/img/shots/items.png)
 
-![Settings](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/settings.svg)
+![Settings](https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/settings.svg)
 
-<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/settings-table.svg" alt="Settings table: Melting, On, Snowmen slowly melt where a snow golem would, unless they wear a Top Hat; Ball size limit, 0 (no limit), How big a snowball can grow while rolling; Max stack height, 5, How many snowballs can be stacked (3 to 32); Snow trail, On, Rolling picks up the snow and leaves bare ground behind; Rotate hint, On, Shows &quot;Press R to turn the snowman&quot; next to a finished snowman" width="100%">
+<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/settings-table.svg" alt="Settings table: Melting, On, Snowmen slowly melt where a snow golem would, unless they wear a Top Hat or a Santa Hat; Ball size limit, 0 (no limit), How big a snowball can grow while rolling; Max stack height, 5, How many snowballs can be stacked (3 to 32); Snow trail, On, Rolling picks up the snow and leaves bare ground behind; Rotate hint, On, Shows &quot;Press R to turn the snowman&quot; next to a finished snowman; Ligh" width="100%">
 
-<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/settings-box.svg" alt="Change them with /mycel set snowmen <key> <value>, or in the config screen from the mod list on Forge and NeoForge." width="100%">
+<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/settings-box.svg" alt="Change them with /mycel set snowmen <key> <value>, or in the config screen from the mod list on Forge and NeoForge." width="100%">
 
-![Good to know](https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/good-to-know.svg)
+![Good to know](https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/good-to-know.svg)
 
-<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/d2e2d2ba2c74/docs/img/banners/good-to-know-box.svg" alt="Install it on the server and on every client: it adds three items, the Rolled Snowball, the Top Hat and the Scarf. Every action has its own snowy sound, with subtitles. Snowmen are made of vanilla display entities. Without Mycel the game still starts: Snowman stays off and tells you in chat that Mycel is missing." width="100%">
+<img src="https://raw.githubusercontent.com/MyCelium-GG/Snowman/334d80f4e974/docs/img/banners/good-to-know-box.svg" alt="Seven advancements in their own Snowman tab, from packing your first snowball to a fully dressed snowman. Install it on the server and on every client: it adds five items, the Rolled Snowball, the Top Hat, the Santa Hat, the Scarf and the Fairy Lights. Every action has its own snowy sound, with subtitles. Snowmen are made of vanilla display entities. Without Mycel the game still starts: Snowman st" width="100%">
