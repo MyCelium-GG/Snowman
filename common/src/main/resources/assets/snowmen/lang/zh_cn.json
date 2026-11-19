@@ -43,5 +43,21 @@
   "advancements.snowmen.dressed.title": "十二月装扮",
   "advancements.snowmen.dressed.description": "给雪人装上眼睛、笑容、鼻子、三颗纽扣、两只手臂、围巾和帽子",
   "advancements.snowmen.snowball_fight.title": "打雪仗！",
-  "advancements.snowmen.snowball_fight.description": "打一下有眼睛的雪人，接住它扔回来的雪球"
+  "advancements.snowmen.snowball_fight.description": "打一下有眼睛的雪人，接住它扔回来的雪球",
+  "snowmen.config.melting": "融化",
+  "snowmen.config.melting.desc": "在雪傀儡会融化的地方（如沙漠和下界），雪人和雪球会慢慢融化。",
+  "snowmen.config.ballSizeLimit": "雪球大小上限",
+  "snowmen.config.ballSizeLimit.desc": "滚动时雪球能长到多大。0 表示不限。",
+  "snowmen.config.maxStackHeight": "最大堆叠高度",
+  "snowmen.config.maxStackHeight.desc": "可以堆叠多少个雪球。三个成一个雪人，更多会更高。",
+  "snowmen.config.snowTrail": "雪地痕迹",
+  "snowmen.config.snowTrail.desc": "滚动的雪球会带走雪，留下一道裸露的地面。",
+  "snowmen.config.rotateHint": "旋转提示",
+  "snowmen.config.rotateHint.desc": "站在完成的雪人旁时，在快捷栏上方显示提示。",
+  "snowmen.config.lightsChase": "流动彩灯",
+  "snowmen.config.lightsChase.desc": "雪人身上的彩灯像真的圣诞灯一样依次变色。",
+  "snowmen.config.throwBack": "回击",
+  "snowmen.config.throwBack.desc": "打一下有眼睛的雪人，它会扔回一个雪球。",
+  "snowmen.missing_mycel": "缺少 Mycel。%s 需要 Mycel 库才能运行，安装前不会生效。",
+  "snowmen.missing_mycel.download": "[下载 Mycel]"
 }

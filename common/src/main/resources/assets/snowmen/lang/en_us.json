@@ -43,5 +43,21 @@
   "advancements.snowmen.dressed.title": "Dressed for December",
   "advancements.snowmen.dressed.description": "Give a snowman eyes, a smile, a nose, three buttons, two arms, a scarf and a hat",
   "advancements.snowmen.snowball_fight.title": "Snowball Fight!",
-  "advancements.snowmen.snowball_fight.description": "Hit a snowman with eyes and get a snowball back"
+  "advancements.snowmen.snowball_fight.description": "Hit a snowman with eyes and get a snowball back",
+  "snowmen.config.melting": "Melting",
+  "snowmen.config.melting.desc": "Snowmen and snowballs slowly melt in places where a snow golem would melt, like deserts and the Nether.",
+  "snowmen.config.ballSizeLimit": "Snowball size limit",
+  "snowmen.config.ballSizeLimit.desc": "How big a snowball can grow while rolling. 0 means no limit.",
+  "snowmen.config.maxStackHeight": "Max stack height",
+  "snowmen.config.maxStackHeight.desc": "How many snowballs can be stacked. Three make a snowman; more make it taller.",
+  "snowmen.config.snowTrail": "Snow trail",
+  "snowmen.config.snowTrail.desc": "Rolling a snowball picks up the snow it rolls over and leaves a trail of bare ground.",
+  "snowmen.config.rotateHint": "Rotate hint",
+  "snowmen.config.rotateHint.desc": "Show a hint above the hotbar when you stand next to a finished snowman.",
+  "snowmen.config.lightsChase": "Running lights",
+  "snowmen.config.lightsChase.desc": "Fairy lights on a snowman change colour one after another, like real Christmas lights.",
+  "snowmen.config.throwBack": "Throw back",
+  "snowmen.config.throwBack.desc": "A snowman with eyes throws a snowball back when you hit it once.",
+  "snowmen.missing_mycel": "Mycel is missing. %s needs the Mycel library to work and stays off until it is installed.",
+  "snowmen.missing_mycel.download": "[Download Mycel]"
 }

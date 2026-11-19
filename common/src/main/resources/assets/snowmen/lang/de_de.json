@@ -43,5 +43,21 @@
   "advancements.snowmen.dressed.title": "Bereit für Dezember",
   "advancements.snowmen.dressed.description": "Gib einem Schneemann Augen, ein Lächeln, eine Nase, drei Knöpfe, zwei Arme, einen Schal und einen Hut",
   "advancements.snowmen.snowball_fight.title": "Schneeballschlacht!",
-  "advancements.snowmen.snowball_fight.description": "Schlag einen Schneemann mit Augen und bekomm einen Schneeball zurück"
+  "advancements.snowmen.snowball_fight.description": "Schlag einen Schneemann mit Augen und bekomm einen Schneeball zurück",
+  "snowmen.config.melting": "Schmelzen",
+  "snowmen.config.melting.desc": "Schneemänner und Schneebälle schmelzen langsam dort, wo ein Schneegolem schmelzen würde, etwa in Wüsten und im Nether.",
+  "snowmen.config.ballSizeLimit": "Größte Schneeballgröße",
+  "snowmen.config.ballSizeLimit.desc": "Wie groß ein Schneeball beim Rollen werden kann. 0 heißt ohne Grenze.",
+  "snowmen.config.maxStackHeight": "Höchste Stapelhöhe",
+  "snowmen.config.maxStackHeight.desc": "Wie viele Schneebälle gestapelt werden können. Drei ergeben einen Schneemann, mehr machen ihn größer.",
+  "snowmen.config.snowTrail": "Schneespur",
+  "snowmen.config.snowTrail.desc": "Ein rollender Schneeball nimmt den Schnee auf und hinterlässt eine Spur aus kahlem Boden.",
+  "snowmen.config.rotateHint": "Dreh-Hinweis",
+  "snowmen.config.rotateHint.desc": "Einen Hinweis über der Hotbar zeigen, wenn du neben einem fertigen Schneemann stehst.",
+  "snowmen.config.lightsChase": "Lauflicht",
+  "snowmen.config.lightsChase.desc": "Die Lichterkette am Schneemann wechselt die Farben nacheinander, wie echte Weihnachtslichter.",
+  "snowmen.config.throwBack": "Zurückwerfen",
+  "snowmen.config.throwBack.desc": "Ein Schneemann mit Augen wirft einen Schneeball zurück, wenn du ihn einmal schlägst.",
+  "snowmen.missing_mycel": "Mycel fehlt. %s braucht die Mycel-Bibliothek und bleibt aus, bis sie installiert ist.",
+  "snowmen.missing_mycel.download": "[Mycel herunterladen]"
 }

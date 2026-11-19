@@ -43,5 +43,21 @@
   "advancements.snowmen.dressed.title": "Prêt pour décembre",
   "advancements.snowmen.dressed.description": "Donnez à un bonhomme de neige des yeux, un sourire, un nez, trois boutons, deux bras, une écharpe et un chapeau",
   "advancements.snowmen.snowball_fight.title": "Bataille de boules de neige !",
-  "advancements.snowmen.snowball_fight.description": "Frappez un bonhomme de neige qui a des yeux et recevez une boule en retour"
+  "advancements.snowmen.snowball_fight.description": "Frappez un bonhomme de neige qui a des yeux et recevez une boule en retour",
+  "snowmen.config.melting": "Fonte",
+  "snowmen.config.melting.desc": "Les bonshommes et boules de neige fondent lentement là où un golem de neige fondrait, comme dans les déserts et le Nether.",
+  "snowmen.config.ballSizeLimit": "Taille max des boules",
+  "snowmen.config.ballSizeLimit.desc": "Jusqu'où une boule grossit en roulant. 0 = sans limite.",
+  "snowmen.config.maxStackHeight": "Hauteur max de pile",
+  "snowmen.config.maxStackHeight.desc": "Combien de boules on peut empiler. Trois font un bonhomme ; plus le grandissent.",
+  "snowmen.config.snowTrail": "Trace dans la neige",
+  "snowmen.config.snowTrail.desc": "Une boule qui roule ramasse la neige et laisse une trace de sol nu.",
+  "snowmen.config.rotateHint": "Indice de rotation",
+  "snowmen.config.rotateHint.desc": "Afficher un indice au-dessus de la barre d'action près d'un bonhomme terminé.",
+  "snowmen.config.lightsChase": "Lumières qui défilent",
+  "snowmen.config.lightsChase.desc": "La guirlande du bonhomme change de couleur l'une après l'autre, comme de vraies lumières de Noël.",
+  "snowmen.config.throwBack": "Riposte",
+  "snowmen.config.throwBack.desc": "Un bonhomme avec des yeux renvoie une boule de neige quand vous le frappez une fois.",
+  "snowmen.missing_mycel": "Mycel est manquant. %s a besoin de la bibliothèque Mycel et reste désactivé tant qu'elle n'est pas installée.",
+  "snowmen.missing_mycel.download": "[Télécharger Mycel]"
 }

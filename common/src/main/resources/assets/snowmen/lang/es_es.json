@@ -43,5 +43,21 @@
   "advancements.snowmen.dressed.title": "Listo para diciembre",
   "advancements.snowmen.dressed.description": "Ponle a un muñeco de nieve ojos, una sonrisa, una nariz, tres botones, dos brazos, una bufanda y un sombrero",
   "advancements.snowmen.snowball_fight.title": "¡Guerra de bolas de nieve!",
-  "advancements.snowmen.snowball_fight.description": "Golpea a un muñeco de nieve con ojos y recibe una bola de vuelta"
+  "advancements.snowmen.snowball_fight.description": "Golpea a un muñeco de nieve con ojos y recibe una bola de vuelta",
+  "snowmen.config.melting": "Derretirse",
+  "snowmen.config.melting.desc": "Los muñecos y las bolas de nieve se derriten poco a poco donde se derretiría un gólem de nieve, como en desiertos y el Nether.",
+  "snowmen.config.ballSizeLimit": "Tamaño máximo de bola",
+  "snowmen.config.ballSizeLimit.desc": "Cuánto puede crecer una bola al rodar. 0 significa sin límite.",
+  "snowmen.config.maxStackHeight": "Altura máxima de pila",
+  "snowmen.config.maxStackHeight.desc": "Cuántas bolas se pueden apilar. Tres hacen un muñeco; más lo hacen más alto.",
+  "snowmen.config.snowTrail": "Rastro de nieve",
+  "snowmen.config.snowTrail.desc": "Al rodar, la bola recoge la nieve y deja un rastro de suelo descubierto.",
+  "snowmen.config.rotateHint": "Aviso de giro",
+  "snowmen.config.rotateHint.desc": "Mostrar un aviso sobre la barra rápida junto a un muñeco terminado.",
+  "snowmen.config.lightsChase": "Luces en movimiento",
+  "snowmen.config.lightsChase.desc": "Las luces del muñeco cambian de color una tras otra, como luces de Navidad de verdad.",
+  "snowmen.config.throwBack": "Devolver bolas",
+  "snowmen.config.throwBack.desc": "Un muñeco con ojos te devuelve una bola de nieve si lo golpeas una vez.",
+  "snowmen.missing_mycel": "Falta Mycel. %s necesita la biblioteca Mycel para funcionar y seguirá desactivado hasta que la instales.",
+  "snowmen.missing_mycel.download": "[Descargar Mycel]"
 }

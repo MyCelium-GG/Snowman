@@ -43,5 +43,21 @@
   "advancements.snowmen.dressed.title": "Готов к декабрю",
   "advancements.snowmen.dressed.description": "Дайте снеговику глаза, улыбку, нос, три пуговицы, две руки, шарф и шляпу",
   "advancements.snowmen.snowball_fight.title": "Снежная битва!",
-  "advancements.snowmen.snowball_fight.description": "Ударьте снеговика с глазами и получите снежок в ответ"
+  "advancements.snowmen.snowball_fight.description": "Ударьте снеговика с глазами и получите снежок в ответ",
+  "snowmen.config.melting": "Таяние",
+  "snowmen.config.melting.desc": "Снеговики и снежные комы медленно тают там, где таял бы снежный голем, например в пустыне и Незере.",
+  "snowmen.config.ballSizeLimit": "Предел размера кома",
+  "snowmen.config.ballSizeLimit.desc": "Насколько может вырасти ком при катании. 0 — без предела.",
+  "snowmen.config.maxStackHeight": "Макс. высота",
+  "snowmen.config.maxStackHeight.desc": "Сколько комов можно поставить друг на друга. Три — снеговик, больше — выше.",
+  "snowmen.config.snowTrail": "След на снегу",
+  "snowmen.config.snowTrail.desc": "Катящийся ком собирает снег и оставляет полосу голой земли.",
+  "snowmen.config.rotateHint": "Подсказка поворота",
+  "snowmen.config.rotateHint.desc": "Показывать подсказку над панелью рядом с готовым снеговиком.",
+  "snowmen.config.lightsChase": "Бегущие огни",
+  "snowmen.config.lightsChase.desc": "Гирлянда на снеговике меняет цвета по очереди, как настоящая.",
+  "snowmen.config.throwBack": "Ответный снежок",
+  "snowmen.config.throwBack.desc": "Снеговик с глазами бросает снежок в ответ, если ударить его один раз.",
+  "snowmen.missing_mycel": "Mycel не установлен. %s нужна библиотека Mycel, без неё мод не работает.",
+  "snowmen.missing_mycel.download": "[Скачать Mycel]"
 }
