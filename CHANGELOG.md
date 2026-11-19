@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.1.0] - 2026-11-18
+## [1.1.0] - 2026-11-19
 
 ### Added
 - Fairy Lights: wind a string of lights around a snowman. They glow in the dark and the colours run along the string. Recipe: string, glowstone dust, string.
