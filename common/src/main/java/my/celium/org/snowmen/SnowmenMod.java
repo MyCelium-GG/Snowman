@@ -26,7 +26,7 @@ public final class SnowmenMod {
 
     public static final ModMetadata META = ModMetadata.builder(ID, "Snowman", "1.2.0")
             .author("MyCelium")
-            .website("https://www.curseforge.com/minecraft/mc-mods/snowmen")
+            .website("https://www.curseforge.com/minecraft/mc-mods/snowman")
             .updateUrl("https://wiki.mycelium-gg.org/updates/snowmen.json")
             .build();
 
