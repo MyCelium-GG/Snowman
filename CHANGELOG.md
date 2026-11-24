@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.1] - 2026-11-24
+
+### Fixed
+- The website link in the mod list now opens the Snowman CurseForge page.
+- The mod list description mentions the knitted Scarf and the Fairy Lights.
+
 ## [1.2.0] - 2026-11-19
 
 ### Added
